@@ -32,7 +32,7 @@
 .slot.corrupt-hit{animation:glitchHit .55s}
 @keyframes glitchHit{0%{box-shadow:inset 0 0 16px rgba(39,174,96,0.1)}20%{box-shadow:inset 0 0 32px rgba(39,174,96,0.65);transform:translateX(-3px)}40%{transform:translateX(3px)}60%{box-shadow:inset 0 0 44px rgba(39,174,96,0.85);transform:translateX(-1px)}100%{box-shadow:inset 0 0 18px rgba(39,174,96,0.25);transform:translateX(0)}}
 .slot.finale-hit{animation:goldHit .65s ease}
-@keyframes goldHit{0%{box-shadow:inset 0 0 16px rgba(201,168,76,.15)}30%{box-shadow:inset 0 0 55px rgba(201,168,76,.9)}100%{box-shadow:inset 0 0 18px rgba(201,168,76,.3)}}
+@keyframes goldHit{0%{box-shadow:inset 0 0 16px rgba(201,168,76,.15);transform:translateX(0)}20%{box-shadow:inset 0 0 55px rgba(201,168,76,.9);transform:translateX(-5px)}40%{transform:translateX(5px)}60%{box-shadow:inset 0 0 60px rgba(201,168,76,.95);transform:translateX(-3px)}80%{transform:translateX(2px)}100%{box-shadow:inset 0 0 18px rgba(201,168,76,.3);transform:translateX(0)}}
 .slot.finale .drum-item.hi{font-size:21px}
 
 .slot-icon-wrap{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;border:1px solid rgba(255,255,255,0.08);z-index:4;transition:background .3s,border-color .3s}
@@ -58,6 +58,8 @@
 .pgenimg{width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .3s;position:absolute;inset:0}
 .pgenimg.slam{animation:slamIn .55s cubic-bezier(.2,1.4,.4,1)}
 @keyframes slamIn{0%{transform:scale(1.4);opacity:0}60%{transform:scale(0.97);opacity:1}100%{transform:scale(1);opacity:1}}
+.pgenframe.slamshake{animation:frameShake .5s ease}
+@keyframes frameShake{0%{transform:translateX(0) translateY(0)}20%{transform:translateX(-6px) translateY(2px)}40%{transform:translateX(6px) translateY(-2px)}60%{transform:translateX(-3px) translateY(1px)}80%{transform:translateX(2px) translateY(0)}100%{transform:translateX(0) translateY(0)}}
 .pgenflash{position:absolute;inset:0;background:radial-gradient(circle,rgba(240,224,176,.95),transparent 70%);opacity:0;pointer-events:none;z-index:6}
 .pgenflash.villain{background:radial-gradient(circle,rgba(200,30,30,.9),transparent 70%)}
 .pgenflash.fire{animation:portFlash .8s ease}
@@ -260,6 +262,51 @@ const MIN_FORGE_TIME=1700;
 // GitHub Pages and similar static hosts always expose page source to visitors, key included.
 const POLLINATIONS_KEY='';
 
+// ---- SFX ----
+const SFX_PATHS={
+  reelSpin:'assets/sfx/reel_spin.mp3',
+  click:'assets/sfx/click_lock.mp3',
+  boom:'assets/sfx/impact_boom.mp3',
+  glitch:'assets/sfx/glitch_dark.mp3',
+  chime:'assets/sfx/chime_reveal.mp3',
+  villain:'assets/sfx/villain_roar.mp3',
+  forge:'assets/sfx/forge_whoosh.mp3',
+  riser:'assets/sfx/suspense_riser.mp3',
+};
+const sfx={};
+Object.keys(SFX_PATHS).forEach(k=>{
+  const a=new Audio(SFX_PATHS[k]);
+  a.preload='auto';
+  sfx[k]=a;
+});
+sfx.reelSpin.loop=true;
+sfx.reelSpin.volume=0.5;
+
+function playSfx(key){
+  const a=sfx[key];
+  if(!a)return;
+  try{a.currentTime=0;}catch(e){}
+  a.play().catch(()=>{});
+}
+function stopSfx(key,fadeMs=150){
+  const a=sfx[key];
+  if(!a||a.paused)return;
+  const startVol=a.volume;
+  if(fadeMs<=0){a.pause();a.currentTime=0;return;}
+  const steps=6;let i=0;
+  const iv=setInterval(()=>{
+    i++;
+    a.volume=Math.max(0,startVol*(1-i/steps));
+    if(i>=steps){
+      clearInterval(iv);
+      a.pause();
+      a.currentTime=0;
+      a.volume=startVol;
+    }
+  },fadeMs/steps);
+}
+function stopAllSfx(){Object.keys(sfx).forEach(k=>stopSfx(k,0));}
+
 function pick(a){return a[Math.floor(Math.random()*a.length)]}
 
 function buildProgressDots(){
@@ -275,6 +322,7 @@ function setSlotIdle(){
 }
 
 function resetStage(){
+  stopAllSfx();
   results={};
   cur=0;
   document.getElementById('chips').innerHTML='';
@@ -284,7 +332,7 @@ function resetStage(){
   document.getElementById('slotBig').classList.remove('climax','corrupt-hit','finale','finale-hit');
   document.getElementById('assembling').classList.remove('manifest','villain','villainbig');
   document.getElementById('root').classList.remove('tainted','taintpulse','villainpulse');
-  document.getElementById('pgenframe').classList.remove('villain');
+  document.getElementById('pgenframe').classList.remove('villain','slamshake');
   document.getElementById('pgenflash').classList.remove('villain');
   document.getElementById('reelwrap').style.display='block';
   document.getElementById('pgenwrap').style.display='none';
@@ -318,6 +366,7 @@ function triggerSlowmoBoom(cfg,inner,visibleIdx,cb){
   setTimeout(()=>{
     const slotBig=document.getElementById('slotBig');
     slotBig.classList.add('boom-hit');
+    playSfx('boom');
     setTimeout(()=>slotBig.classList.remove('boom-hit'),300);
     const swapPool=cfg.corruptible?cfg.corrupt:cfg.rare;
     if(swapPool&&swapPool.length&&Math.random()<0.5){
@@ -330,6 +379,7 @@ function triggerSlowmoBoom(cfg,inner,visibleIdx,cb){
 
 function triggerCorruptionHit(slotEl){
   slotEl.classList.add('corrupt-hit');
+  playSfx('glitch');
   document.getElementById('root').classList.add('tainted','taintpulse');
   setTimeout(()=>{
     slotEl.classList.remove('corrupt-hit');
@@ -340,6 +390,7 @@ function triggerCorruptionHit(slotEl){
 function raceGoldFlash(cb){
   const slotBig=document.getElementById('slotBig');
   slotBig.classList.add('finale-hit');
+  playSfx('chime');
   setTimeout(()=>{
     slotBig.classList.remove('finale-hit');
     setTimeout(cb,600);
@@ -358,6 +409,7 @@ function spinOne(i,onDone){
 
   const slotBig=document.getElementById('slotBig');
   slotBig.classList.add('active');
+  playSfx('reelSpin');
   if(i>=4) slotBig.classList.add('climax'); else slotBig.classList.remove('climax');
   if(i===CFG.length-1) slotBig.classList.add('finale'); else slotBig.classList.remove('finale');
 
@@ -414,12 +466,14 @@ function spinOne(i,onDone){
     else{
       inner.style.transform=`translateY(${endOffset}px)`;
       slotBig.classList.remove('active');
+      stopSfx('reelSpin');
       document.getElementById('pdot'+i).classList.remove('active');
       if(isCorruptSlot) triggerCorruptionHit(slotBig);
       setTimeout(()=>{
         setTimeout(()=>{
           document.getElementById('pdot'+i).classList.add(isCorruptSlot?'corrupt':'done');
           addChip(final,isCorruptSlot);
+          playSfx('click');
           onDone();
         },400);
       },1000);
@@ -434,6 +488,7 @@ function runSlot(i){
 
 function showSuspense(cb){
   const el=document.getElementById('suspense');
+  playSfx('riser');
   const lines=['THE FINAL THREAD AWAITS...','THE GODS EXAMINE YOUR BLOOD...','THEY HAVE DECIDED...'];
   let idx=0;
   el.classList.add('show');
@@ -473,6 +528,7 @@ function runAssembly(cb){
 function runVillainEntrance(cb){
   const a=document.getElementById('assembling');
   document.getElementById('root').classList.add('villainpulse');
+  playSfx('villain');
   a.textContent='⚠ A VILLAIN HAS BEEN BORN ⚠';
   a.classList.add('show','villain','villainbig');
   setTimeout(()=>{
@@ -486,6 +542,7 @@ function runVillainEntrance(cb){
 
 function runManifestation(cb){
   const a=document.getElementById('assembling');
+  playSfx(corrupted?'glitch':'chime');
   const phrases=corrupted
     ?['THE DARKNESS HAS ANSWERED','A CURSE TAKES FORM','THE VILLAIN AWAKENS']
     :['THE GODS HAVE SPOKEN','YOUR FATE TAKES FORM','THE CHOSEN HERO EMERGES'];
@@ -500,6 +557,7 @@ function runManifestation(cb){
 
 function runForgingVessel(cb){
   const a=document.getElementById('assembling');
+  playSfx('forge');
   a.textContent=corrupted?'FORGING A VESSEL OF RUIN...':'FORGING YOUR VESSEL...';
   a.classList.add('show');
   if(corrupted) a.classList.add('villain');
@@ -565,9 +623,11 @@ function runGeneratingPortrait(cb){
       pimg.src=resolvedUrl;
       pimg.style.opacity='1';
       pimg.classList.add('slam');
+      playSfx('boom');
+      pframe.classList.add('slamshake');
       const pf=document.getElementById('pgenflash');
       pf.classList.add('fire');
-      setTimeout(()=>{pf.classList.remove('fire');pimg.classList.remove('slam');},850);
+      setTimeout(()=>{pf.classList.remove('fire');pimg.classList.remove('slam');pframe.classList.remove('slamshake');},850);
       lastPortraitUrl=resolvedUrl;
     } else {
       lastPortraitUrl='';
