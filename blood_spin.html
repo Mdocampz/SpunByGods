@@ -1,0 +1,1082 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+body{background:#050308;min-height:100vh;display:flex;justify-content:center;align-items:flex-start}
+.root{width:380px;min-height:680px;background:#0d0810;font-family:'Cinzel',serif;color:#e8d5a3;position:relative;overflow:hidden;transition:box-shadow .6s}
+.bglayer{position:absolute;inset:0;background:radial-gradient(ellipse at 20% 10%,rgba(120,30,30,0.15) 0%,transparent 50%),radial-gradient(ellipse at 80% 90%,rgba(60,20,80,0.18) 0%,transparent 50%);pointer-events:none;z-index:0;transition:background 1.4s}
+.root.tainted .bglayer{background:radial-gradient(ellipse at 20% 10%,rgba(120,30,30,0.15) 0%,transparent 50%),radial-gradient(ellipse at 80% 90%,rgba(20,90,55,0.24) 0%,transparent 50%)}
+.root.taintpulse{animation:taintFlash .7s ease}
+@keyframes taintFlash{0%{box-shadow:inset 0 0 0 rgba(39,174,96,0)}30%{box-shadow:inset 0 0 70px rgba(39,174,96,.4)}100%{box-shadow:inset 0 0 0 rgba(39,174,96,0)}}
+.z1{position:relative;z-index:1}
+.hdr{text-align:center;padding:18px 16px 6px}
+.htitle{font-size:26px;font-weight:700;letter-spacing:4px;color:#c9a84c;text-shadow:0 0 24px rgba(201,168,76,0.4)}
+.hdiv{width:160px;height:1px;background:linear-gradient(90deg,transparent,#c9a84c55,transparent);margin:5px auto}
+.htag{font-family:'Crimson Text',serif;font-style:italic;font-size:10px;letter-spacing:3px;color:#6a5a3a}
+.hlbl{font-size:8px;letter-spacing:4px;color:#7a6a4a;margin-top:5px}
+.phaselbl{font-size:8px;letter-spacing:3px;color:#42362a;margin-top:3px}
+
+.progress{display:flex;justify-content:center;gap:9px;padding:16px 16px 2px}
+.pdot{width:7px;height:7px;border-radius:50%;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.22);transition:all .4s}
+.pdot.active{background:#c9a84c;box-shadow:0 0 9px rgba(201,168,76,.75);transform:scale(1.35)}
+.pdot.done{background:rgba(201,168,76,0.55);border-color:rgba(201,168,76,0.4)}
+.pdot.corrupt{background:#27ae60;border-color:#27ae60;box-shadow:0 0 9px rgba(39,174,96,.75)}
+
+.stage{padding:10px 18px 0;text-align:center}
+.ritualq{font-family:'Crimson Text',serif;font-style:italic;font-size:14px;color:#dccaa0;letter-spacing:.3px;min-height:18px;transition:opacity .25s}
+.rituallbl{font-size:8px;letter-spacing:3px;color:#6a5a3a;margin:3px 0 10px}
+
+.reelwrap{margin:0 18px;background:rgba(5,3,8,0.92);border:1px solid rgba(201,168,76,0.3);border-radius:10px;overflow:hidden}
+.slot{height:64px;position:relative;overflow:hidden;transition:box-shadow .3s}
+.slot.active{box-shadow:inset 0 0 16px rgba(201,168,76,0.16)}
+.slot.climax.active{box-shadow:inset 0 0 24px rgba(201,168,76,0.28)}
+.slot.corrupt-hit{animation:glitchHit .55s}
+@keyframes glitchHit{0%{box-shadow:inset 0 0 16px rgba(39,174,96,0.1)}20%{box-shadow:inset 0 0 32px rgba(39,174,96,0.65);transform:translateX(-3px)}40%{transform:translateX(3px)}60%{box-shadow:inset 0 0 44px rgba(39,174,96,0.85);transform:translateX(-1px)}100%{box-shadow:inset 0 0 18px rgba(39,174,96,0.25);transform:translateX(0)}}
+.slot.finale-hit{animation:goldHit .65s ease}
+@keyframes goldHit{0%{box-shadow:inset 0 0 16px rgba(201,168,76,.15);transform:translateX(0)}20%{box-shadow:inset 0 0 55px rgba(201,168,76,.9);transform:translateX(-5px)}40%{transform:translateX(5px)}60%{box-shadow:inset 0 0 60px rgba(201,168,76,.95);transform:translateX(-3px)}80%{transform:translateX(2px)}100%{box-shadow:inset 0 0 18px rgba(201,168,76,.3);transform:translateX(0)}}
+.slot.finale .drum-item.hi{font-size:21px}
+
+.slot-icon-wrap{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;border:1px solid rgba(255,255,255,0.08);z-index:4;transition:background .3s,border-color .3s}
+
+.drum{position:absolute;left:60px;right:0;top:0;bottom:0;overflow:hidden;z-index:3}
+.drum-inner{position:absolute;left:0;right:0;top:0;will-change:transform}
+.drum-item{height:64px;display:flex;align-items:center;padding:0 10px;font-size:15px;font-weight:600;letter-spacing:.3px;color:#8a7a5a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.drum-item.hi{color:#f0e0b0;font-size:17px;text-shadow:0 0 9px rgba(240,224,176,0.45)}
+.slot.climax .drum-item{font-size:16px}
+.slot.climax .drum-item.hi{font-size:19px}
+
+.drum-top{position:absolute;left:60px;right:0;top:0;height:18px;background:linear-gradient(to bottom,rgba(12,8,18,1),transparent);z-index:5;pointer-events:none}
+.drum-bot{position:absolute;left:60px;right:0;bottom:0;height:18px;background:linear-gradient(to top,rgba(12,8,18,1),transparent);z-index:5;pointer-events:none}
+.drum-line{position:absolute;left:60px;right:0;top:50%;height:1px;background:rgba(201,168,76,0.2);z-index:6;pointer-events:none;transform:translateY(-50%)}
+
+.slot.boom-hit{animation:boomHit .3s ease}
+@keyframes boomHit{0%{box-shadow:inset 0 0 10px rgba(255,255,255,0.1);transform:translateX(0)}15%{box-shadow:inset 0 0 50px rgba(255,255,255,0.9);transform:translateX(-4px)}30%{transform:translateX(4px)}50%{box-shadow:inset 0 0 30px rgba(255,255,255,0.5);transform:translateX(-2px)}100%{box-shadow:inset 0 0 12px rgba(201,168,76,0.15);transform:translateX(0)}}
+
+.pgenwrap{margin:0 18px;display:none}
+.pgenframe{position:relative;width:140px;height:188px;margin:0 auto;border:1px solid rgba(201,168,76,0.35);border-radius:8px;overflow:hidden;background:rgba(5,3,8,0.92);display:flex;align-items:center;justify-content:center}
+.pgenframe.villain{border-color:rgba(200,30,30,0.55)}
+.pgenspinner{width:26px;height:26px;border:2px solid rgba(201,168,76,0.18);border-top-color:#c9a84c;border-radius:50%;animation:spin 0.8s linear infinite}
+.pgenimg{width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .3s;position:absolute;inset:0}
+.pgenimg.slam{animation:slamIn .55s cubic-bezier(.2,1.4,.4,1)}
+@keyframes slamIn{0%{transform:scale(1.4);opacity:0}60%{transform:scale(0.97);opacity:1}100%{transform:scale(1);opacity:1}}
+.pgenframe.slamshake{animation:frameShake .5s ease}
+@keyframes frameShake{0%{transform:translateX(0) translateY(0)}20%{transform:translateX(-6px) translateY(2px)}40%{transform:translateX(6px) translateY(-2px)}60%{transform:translateX(-3px) translateY(1px)}80%{transform:translateX(2px) translateY(0)}100%{transform:translateX(0) translateY(0)}}
+.pgenflash{position:absolute;inset:0;background:radial-gradient(circle,rgba(240,224,176,.95),transparent 70%);opacity:0;pointer-events:none;z-index:6}
+.pgenflash.villain{background:radial-gradient(circle,rgba(200,30,30,.9),transparent 70%)}
+.pgenflash.fire{animation:portFlash .8s ease}
+
+.chips{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;padding:9px 16px 0;min-height:20px;transition:transform .5s,filter .5s}
+.chips.converge{animation:converge 1.2s ease}
+@keyframes converge{0%{transform:scale(1)}50%{transform:scale(1.07);filter:brightness(1.45)}100%{transform:scale(1)}}
+.chip{font-family:'Crimson Text',serif;font-size:9px;letter-spacing:.4px;color:#c9a84c;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.25);border-radius:10px;padding:3px 9px;animation:fadeUp .4s ease}
+.chip.corrupt{color:#27ae60;border-color:rgba(39,174,96,.45);background:rgba(39,174,96,.08)}
+.chip.locking{animation:lockPulse .3s ease}
+@keyframes lockPulse{0%{transform:scale(1)}50%{transform:scale(1.28);box-shadow:0 0 10px rgba(201,168,76,.65)}100%{transform:scale(1)}}
+
+.suspense{text-align:center;padding:0;font-family:'Crimson Text',serif;font-style:italic;font-size:11px;color:#7a6a4a;opacity:0;height:0;overflow:hidden;transition:opacity .4s}
+.suspense.show{opacity:1;height:18px;padding:8px 0 0;animation:flicker 1.5s ease}
+@keyframes flicker{0%,100%{opacity:.55}50%{opacity:1}}
+
+.assembling{text-align:center;font-family:'Cinzel',serif;font-size:10px;letter-spacing:3px;color:#c9a84c;opacity:0;height:0;overflow:hidden;transition:opacity .4s}
+.assembling.show{opacity:1;height:auto;padding:12px 0 0;animation:pulseGlow 1.3s ease}
+.assembling.manifest{font-size:13px;letter-spacing:4px}
+.assembling.villain{color:#e85a5a;text-shadow:0 0 14px rgba(232,90,90,.7)}
+.assembling.villainbig{font-size:14px;letter-spacing:2px}
+.root.villainpulse{animation:villainFlash .7s ease}
+@keyframes villainFlash{0%{box-shadow:inset 0 0 0 rgba(200,30,30,0)}25%{box-shadow:inset 0 0 90px rgba(200,30,30,.55);transform:translateX(-3px)}50%{transform:translateX(3px)}75%{box-shadow:inset 0 0 60px rgba(200,30,30,.35);transform:translateX(-1px)}100%{box-shadow:inset 0 0 0 rgba(200,30,30,0);transform:translateX(0)}}
+@keyframes pulseGlow{0%,100%{text-shadow:0 0 6px rgba(201,168,76,.3)}50%{text-shadow:0 0 18px rgba(201,168,76,.85)}}
+
+.spinarea{padding:14px 18px 5px;text-align:center}
+.spinbtn{background:rgba(18,10,5,0.95);border:1px solid #c9a84c;color:#c9a84c;font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;padding:9px 20px;border-radius:4px;cursor:pointer;width:100%;transition:all 0.2s;text-shadow:0 0 4px rgba(201,168,76,0.3)}
+.spinbtn:hover:not(:disabled){background:rgba(201,168,76,0.1)}
+.spinbtn:disabled{opacity:0.45;cursor:not-allowed}
+.spinsub{font-family:'Crimson Text',serif;font-style:italic;font-size:9px;color:#4a3a2a;letter-spacing:2px;margin-top:3px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.bnav{display:flex;justify-content:space-around;padding:9px 12px 13px;border-top:1px solid rgba(201,168,76,0.12);margin-top:6px}
+.ni{display:flex;flex-direction:column;align-items:center;gap:2px;opacity:0.45;cursor:pointer;padding:3px 5px;transition:opacity 0.2s}
+.ni.act{opacity:1}
+.nico{width:22px;height:22px;border:1px solid rgba(201,168,76,0.35);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#c9a84c}
+.ni.act .nico{border-color:#c9a84c;background:rgba(201,168,76,0.08)}
+.nlbl{font-size:7px;letter-spacing:1px;color:#5a4a3a}
+.ni.act .nlbl{color:#c9a84c}
+
+.charcard{display:none;position:absolute;inset:0;background:#0d0810;z-index:100;overflow-y:auto;padding:14px;font-family:'Cinzel',serif;color:#e8d5a3}
+.cctop{text-align:center;margin-bottom:10px}
+.cceyebrow{font-size:8px;letter-spacing:4px;color:#c9a84c}
+.ccname{font-size:18px;font-weight:700;color:#f0e0b0;text-shadow:0 0 14px rgba(201,168,76,0.35);margin-top:2px}
+.cbadge{display:none;background:rgba(0,25,10,0.8);border:1px solid #27ae60;border-radius:4px;padding:3px 8px;text-align:center;margin-bottom:8px;font-size:8.5px;letter-spacing:2px;color:#27ae60;text-shadow:0 0 3px rgba(39,174,96,0.5)}
+.cbadge.show{display:block;animation:fadeUp 0.5s}
+.ccbody{display:flex;gap:8px;margin-bottom:10px}
+.ccattrs{flex:1}
+.arow{display:flex;align-items:center;gap:5px;padding:4px 0;border-bottom:1px solid rgba(201,168,76,0.08);opacity:0}
+.detailsin .arow{animation:fadeUp .4s ease both}
+.aico{font-size:12px;width:16px;text-align:center;flex-shrink:0}
+.albl{font-size:7.5px;letter-spacing:1.5px;color:#5a4a3a;width:46px;flex-shrink:0}
+.aval{font-family:'Crimson Text',serif;font-size:11px;color:#c9a84c;font-weight:600}
+.ccport{width:82px;flex-shrink:0}
+.portframe{width:82px;height:112px;border:1px solid rgba(201,168,76,0.3);border-radius:6px;overflow:hidden;background:rgba(5,3,10,0.8);display:flex;align-items:center;justify-content:center;position:relative}
+.portimg{width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.5s;position:absolute;inset:0}
+.portflash{position:absolute;inset:0;background:radial-gradient(circle,rgba(240,224,176,.95),transparent 70%);opacity:0;pointer-events:none;z-index:6}
+.portflash.fire{animation:portFlash .8s ease}
+@keyframes portFlash{0%{opacity:0}30%{opacity:1}100%{opacity:0}}
+.ploading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.pspinner{width:18px;height:18px;border:2px solid rgba(201,168,76,0.18);border-top-color:#c9a84c;border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ptxt{font-size:7.5px;letter-spacing:1px;color:#4a3a2a;text-align:center}
+.synbox{background:rgba(8,5,12,0.8);border:1px solid rgba(201,168,76,0.18);border-radius:5px;padding:8px;margin-bottom:8px;opacity:0}
+.detailsin .synbox{animation:fadeUp .5s ease both;animation-delay:.15s}
+.syntitle{font-size:8.5px;letter-spacing:2px;color:#7a6a4a;margin-bottom:4px}
+.synbody{font-family:'Crimson Text',serif;font-size:11px;color:#a09070;line-height:1.5;font-style:italic}
+.synquote{font-family:'Crimson Text',serif;font-size:11px;color:#6a5a3a;font-style:italic;text-align:center;border-top:1px solid rgba(201,168,76,0.12);margin-top:6px;padding-top:6px}
+.backbtn{background:transparent;border:1px solid rgba(201,168,76,0.35);color:#7a6a4a;font-family:'Cinzel',serif;font-size:8.5px;letter-spacing:2px;padding:7px 12px;border-radius:4px;cursor:pointer;width:100%;transition:all 0.2s}
+.backbtn:hover{border-color:#c9a84c;color:#c9a84c}
+.nextteaser{text-align:center;font-family:'Cinzel',serif;font-size:8px;letter-spacing:2.5px;color:#7a6a4a;margin-top:10px;animation:teaserGlow 2.4s ease infinite}
+@keyframes teaserGlow{0%,100%{opacity:.55}50%{opacity:1}}
+
+.archivecard{display:none;position:absolute;inset:0;background:#0d0810;z-index:100;overflow-y:auto;padding:14px;font-family:'Cinzel',serif;color:#e8d5a3}
+.archivelist{display:flex;flex-direction:column;gap:8px;margin:12px 0}
+.archiveempty{text-align:center;font-family:'Crimson Text',serif;font-style:italic;font-size:11px;color:#5a4a3a;padding:20px 0}
+.archiveitem{background:rgba(8,5,12,0.8);border:1px solid rgba(201,168,76,0.18);border-radius:6px;padding:8px 10px;display:flex;flex-direction:column;gap:6px}
+.archiveitem.corrupt{border-color:rgba(39,174,96,.4)}
+.archname{font-size:12px;font-weight:600;color:#f0e0b0}
+.archmeta{font-family:'Crimson Text',serif;font-size:9px;color:#8a7a5a;font-style:italic}
+.archactions{display:flex;gap:5px}
+.archtop{display:flex;justify-content:space-between;align-items:flex-start;gap:6px}
+.archdeletebtn{background:rgba(180,40,40,0.1);border:1px solid rgba(200,60,60,0.4);color:#d86a6a;font-size:11px;width:24px;height:24px;border-radius:4px;cursor:pointer;flex-shrink:0;transition:all .2s;line-height:1}
+.archdeletebtn:hover{background:rgba(200,60,60,0.3);border-color:#e88;color:#fff}
+.archcopybtn{flex:1;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.35);color:#c9a84c;font-family:'Cinzel',serif;font-size:8px;letter-spacing:.5px;padding:6px 4px;border-radius:4px;cursor:pointer;white-space:nowrap;transition:all .2s}
+.archcopybtn:hover:not(:disabled){background:rgba(201,168,76,0.22)}
+.archcopybtn.copied{background:rgba(39,174,96,0.25);border-color:#27ae60;color:#27ae60}
+.archcopybtn:disabled{opacity:.3;cursor:not-allowed}
+.archsecretbox{margin-top:4px;border-top:1px solid rgba(201,168,76,0.1);padding-top:6px}
+.archsecretlbl{font-size:8px;letter-spacing:2px;color:#7a6a4a;margin-bottom:4px}
+.archsecrettext{font-family:'Crimson Text',serif;font-size:10px;color:#c9a84c;font-style:italic;line-height:1.4;margin-bottom:5px;min-height:14px}
+.archsecrettext.empty{color:#3a2f22}
+.archsecretinput{display:none;width:100%;min-height:44px;background:rgba(5,3,8,0.9);border:1px solid rgba(201,168,76,0.25);border-radius:4px;color:#c9a84c;font-family:'Crimson Text',serif;font-size:10px;font-style:italic;padding:6px;resize:vertical;margin-bottom:5px}
+.archsecretinput.open{display:block}
+.archsecretbtns{display:flex;gap:5px}
+.archsecretsave{flex:1;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.35);color:#c9a84c;font-family:'Cinzel',serif;font-size:8px;letter-spacing:.5px;padding:5px;border-radius:4px;cursor:pointer;transition:all .2s}
+.archsecretsave:hover{background:rgba(201,168,76,0.22)}
+.archsecretsave.saved{background:rgba(39,174,96,0.2);border-color:#27ae60;color:#27ae60}
+.restorebox{background:rgba(8,5,12,0.8);border:1px solid rgba(201,168,76,0.18);border-radius:5px;padding:10px;margin-top:14px}
+.restoreinput{width:100%;min-height:50px;background:rgba(5,3,8,0.9);border:1px solid rgba(201,168,76,0.25);border-radius:4px;color:#c9a84c;font-family:'Crimson Text',serif;font-size:10px;padding:7px;margin:6px 0;resize:vertical}
+.restoremsg{font-family:'Crimson Text',serif;font-size:9px;font-style:italic;color:#27ae60;text-align:center;min-height:14px;margin-top:4px}
+.restoremsg.err{color:#e85a5a}
+</style>
+
+<div class="root" id="root">
+<div class="bglayer"></div>
+<div class="z1">
+  <div class="hdr">
+    <div class="htitle">SPUN BY GODS</div>
+    <div class="hdiv"></div>
+    <div class="htag">Fate is not chosen. It is Spun.</div>
+    <div class="hdiv" style="margin-top:5px"></div>
+    <div class="hlbl">✦ FATE REEL ✦</div>
+    <div class="phaselbl">BLOOD SPIN — PHASE I OF III</div>
+  </div>
+
+  <div class="progress" id="progress"></div>
+
+  <div class="stage">
+    <div class="ritualq" id="ritualQ">What Have The Gods Chosen For You?</div>
+    <div class="rituallbl" id="ritualLbl">AWAITING FATE</div>
+  </div>
+
+  <div class="reelwrap" id="reelwrap">
+    <div class="slot" id="slotBig">
+      <div class="slot-icon-wrap" id="iconWrap">☸</div>
+      <div class="drum" id="drum">
+        <div class="drum-inner" id="drumInner"></div>
+      </div>
+      <div class="drum-top"></div>
+      <div class="drum-bot"></div>
+      <div class="drum-line"></div>
+    </div>
+  </div>
+
+  <div class="pgenwrap" id="pgenwrap">
+    <div class="pgenframe" id="pgenframe">
+      <div class="pgenspinner" id="pgenspinner"></div>
+      <img class="pgenimg" id="pgenimg" alt="portrait reveal">
+      <div class="pgenflash" id="pgenflash"></div>
+    </div>
+  </div>
+
+  <div class="chips" id="chips"></div>
+  <div class="suspense" id="suspense"></div>
+  <div class="assembling" id="assembling"></div>
+
+  <div class="spinarea">
+    <button class="spinbtn" id="spinbtn" onclick="onSpin()">SPIN BY THE GODS</button>
+    <div class="spinsub">✦ FATE AWAITS ✦</div>
+  </div>
+
+  <div class="bnav">
+    <div class="ni act"><div class="nico">🩸</div><div class="nlbl">BLOOD SPIN</div></div>
+    <div class="ni" onclick="window.location.href='soul_spin.html'"><div class="nico">☯</div><div class="nlbl">SOUL SPIN</div></div>
+    <div class="ni"><div class="nico">⚡</div><div class="nlbl">POWER SPIN</div></div>
+    <div class="ni" onclick="openArchive()"><div class="nico">📜</div><div class="nlbl">ARCHIVE</div></div>
+  </div>
+</div>
+
+<div class="charcard" id="charcard">
+  <div class="cctop">
+    <div class="cceyebrow">✦ YOUR CHOSEN HERO ✦</div>
+    <div class="hdiv"></div>
+    <div class="ccname" id="ccname">—</div>
+  </div>
+  <div class="cbadge" id="cbadge">⚠ FATE DISTORTION ACTIVE ⚠</div>
+  <div class="ccbody">
+    <div class="ccattrs" id="ccattrs"></div>
+    <div class="ccport">
+      <div class="portframe">
+        <div class="ploading" id="ploading">
+          <div class="pspinner"></div>
+          <div class="ptxt">FORGING<br>PORTRAIT</div>
+        </div>
+        <div class="portflash" id="portflash"></div>
+        <img class="portimg" id="portimg" alt="portrait">
+      </div>
+    </div>
+  </div>
+  <div class="synbox">
+    <div class="syntitle">✦ LORE SYNOPSIS</div>
+    <div class="synbody" id="synbody">—</div>
+    <div class="synquote" id="synquote">—</div>
+  </div>
+  <button class="backbtn" onclick="goBack()">↺ SPIN AGAIN</button>
+  <div class="nextteaser">⚡ COMING NEXT: SOUL SPIN ⚡</div>
+</div>
+
+<div class="archivecard" id="archivecard">
+  <div class="cctop">
+    <div class="cceyebrow">✦ LEGEND ARCHIVE ✦</div>
+    <div class="hdiv"></div>
+    <div class="ccname" style="font-size:13px">Your Saved Characters</div>
+  </div>
+  <div class="archivelist" id="archiveList"></div>
+  <div class="restorebox">
+    <div class="syntitle">✦ RESTORE FROM CODE</div>
+    <textarea id="restoreInput" class="restoreinput" placeholder="Paste backup code here..."></textarea>
+    <button class="backbtn" onclick="importCharacterCode()">⤴ RESTORE CHARACTER</button>
+    <div class="restoremsg" id="restoreMsg"></div>
+  </div>
+  <button class="backbtn" onclick="closeArchive()" style="margin-top:8px">↺ BACK TO FATE REEL</button>
+</div>
+</div>
+
+<script>
+const CFG=[
+  {key:'region',icon:'🌙',ic:'rgba(30,80,140,0.15)',ib:'rgba(30,80,140,0.3)',
+   lbl:'BIRTH REGION',question:'Where Were You Born?',
+   pool:['Northlands','Southlands','Eastern Realm','Western Wilds','Central Empire','Forbidden Lands','Moonfall Valley','Ashen Coast','Ironspire Heights','Shadowfen Marsh','Sunken Reaches','The Hollow Expanse','Frostfall Reaches','Crimson Steppes','The Whispering Wilds','Duskmere Lowlands'],
+   rare:['The Void Between Worlds','Forgotten Eden']},
+  {key:'affiliation',icon:'⚔️',ic:'rgba(140,30,30,0.15)',ib:'rgba(140,30,30,0.3)',
+   lbl:'AFFILIATION',question:'Who Claimed Your Loyalty?',
+   pool:['Crimson Dynasty','Iron Legion','Silver Covenant','Shadow Veil','Celestial Order','Grimfang Clan','Ashen Brotherhood','The Hollow Choir','Obsidian Throne','Wraithguard','Ember Pact','The Glass Covenant','Bloodmoon Syndicate','Stormwake Fleet','The Severed Hand','Nightfall Concordat'],
+   rare:['The Forgotten Order','Godslayer Cabal']},
+  {key:'status',icon:'👑',ic:'rgba(180,150,30,0.15)',ib:'rgba(180,150,30,0.3)',
+   lbl:'STATUS',question:'What Is Your Standing?',
+   pool:['Heir','Outcast','Ward','Exile','Noble','Vassal','Prince','Warlord','Forsaken','Champion','Sovereign','Pariah','Regent','Wanderer','Acolyte','Marshal'],
+   rare:['Godking','Living Legend']},
+  {key:'trait',icon:'🔥',ic:'rgba(180,80,20,0.15)',ib:'rgba(180,80,20,0.3)',
+   lbl:'PHYSICAL TRAIT',question:'What Marks Your Flesh?',
+   pool:['Black Flames','Scarred Eyes','Bone Markings','Silver Veins','Ash Skin','Hollow Voice','Wolf Teeth','Cracked Horns','Ember Glow','Void Pupils','Frost-Kissed Skin','Burning Sigils','Twin-Colored Eyes','Molten Scars','Pale Hollow Eyes','Thornveined Skin'],
+   rare:['Starfire Eyes','Reality-Cracked Skin']},
+  {key:'gift',icon:'✨',ic:'rgba(80,30,140,0.15)',ib:'rgba(80,30,140,0.3)',
+   lbl:'BLOODLINE GIFT',question:'What Flows Through Your Blood?',
+   pool:['Flame Blood','Shadow Touch','Ice Vein','Storm Born','Void Mark','Time Scar','Gravity Sense','Soul Sight','Iron Skin','Death Whisper','Bone Memory','Starlight Veins','Plague Hand','Mirror Soul','Thornblood','Echo Step','Ashen Pulse'],
+   corrupt:["Soul Eater","Reality Tear","God's Wound","Entropy Touch","The Unmaking","Flesh Corruption","Mind Parasite","The Devourer's Mark","Hollow Curse","Plague Heart"],corruptible:true},
+  {key:'race',icon:'🐺',ic:'rgba(180,60,60,0.15)',ib:'rgba(180,60,60,0.3)',
+   lbl:'RACE',question:'What Are You?',
+   pool:['Human','Beastfolk','Half-Blood','Elven','Dwarven','Fallen-Born','Orcish','Drakkin','Fae-Touched','Stoneborn','Skyborn','Frostkin','Treant-Born','Serpentkin','Cindersoul','Mistwalker'],
+   corrupt:['Void Walker','Shade Born','Corrupted One','The Unnamed','Nightmare Kin','Soul Husk','The Hollowed','Plaguekin','Abyss-Touched','The Forsaken Flesh'],corruptible:true},
+];
+
+const DURATIONS=[3200,3800,4600,5200,5800,8500];
+const GAPS=[200,200,200,200,200,200];
+
+let results={};
+let corrupted=false;
+let running=false;
+let cur=0;
+let portraitStartTime=0;
+let lastPortraitUrl='';
+let lastPortraitDataUrl='';
+let lastPortraitError='';
+const MIN_FORGE_TIME=1700;
+// Optional: paste a free publishable key from enter.pollinations.ai here (pk_...) for a much higher rate limit.
+// Leave blank to use anonymous access (1 request every 15s, can silently return a placeholder when limited).
+// NOTE: do not put a secret-type key (sk_) here if this file will ever be hosted/shared publicly —
+// GitHub Pages and similar static hosts always expose page source to visitors, key included.
+const POLLINATIONS_KEY='';
+
+// ---- SFX ----
+const SFX_PATHS={
+  reelSpin:'assets/sfx/reel_spin.mp3',
+  click:'assets/sfx/click_lock.mp3',
+  boom:'assets/sfx/impact_boom.mp3',
+  glitch:'assets/sfx/glitch_dark.mp3',
+  chime:'assets/sfx/chime_reveal.mp3',
+  villain:'assets/sfx/villain_roar.mp3',
+  forge:'assets/sfx/forge_whoosh.mp3',
+  riser:'assets/sfx/suspense_riser.mp3',
+};
+const sfx={};
+Object.keys(SFX_PATHS).forEach(k=>{
+  const a=new Audio(SFX_PATHS[k]);
+  a.preload='auto';
+  sfx[k]=a;
+});
+sfx.reelSpin.loop=true;
+sfx.reelSpin.volume=0.35;
+
+function playSfx(key){
+  const a=sfx[key];
+  if(!a)return;
+  try{a.currentTime=0;}catch(e){}
+  a.play().catch(()=>{});
+}
+function stopSfx(key,fadeMs=150){
+  const a=sfx[key];
+  if(!a||a.paused)return;
+  const startVol=a.volume;
+  if(fadeMs<=0){a.pause();a.currentTime=0;return;}
+  const steps=6;let i=0;
+  const iv=setInterval(()=>{
+    i++;
+    a.volume=Math.max(0,startVol*(1-i/steps));
+    if(i>=steps){
+      clearInterval(iv);
+      a.pause();
+      a.currentTime=0;
+      a.volume=startVol;
+    }
+  },fadeMs/steps);
+}
+function stopAllSfx(){Object.keys(sfx).forEach(k=>stopSfx(k,0));}
+
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+
+function buildProgressDots(){
+  document.getElementById('progress').innerHTML=CFG.map((_,i)=>`<div class="pdot" id="pdot${i}"></div>`).join('');
+}
+
+function setSlotIdle(){
+  const iw=document.getElementById('iconWrap');
+  iw.style.background='rgba(255,255,255,0.04)';
+  iw.style.borderColor='rgba(255,255,255,0.08)';
+  iw.textContent='☸';
+  document.getElementById('drumInner').innerHTML='<div class="drum-item" style="color:#3a2f22">—</div>';
+}
+
+function resetStage(){
+  stopAllSfx();
+  results={};
+  cur=0;
+  document.getElementById('chips').innerHTML='';
+  document.getElementById('chips').classList.remove('converge');
+  document.getElementById('assembling').classList.remove('show');
+  document.getElementById('suspense').classList.remove('show');
+  document.getElementById('slotBig').classList.remove('climax','corrupt-hit','finale','finale-hit');
+  document.getElementById('assembling').classList.remove('manifest','villain','villainbig');
+  document.getElementById('root').classList.remove('tainted','taintpulse','villainpulse');
+  document.getElementById('pgenframe').classList.remove('villain','slamshake');
+  document.getElementById('pgenflash').classList.remove('villain');
+  document.getElementById('reelwrap').style.display='block';
+  document.getElementById('pgenwrap').style.display='none';
+  document.getElementById('pgenimg').style.opacity='0';
+  document.getElementById('pgenimg').classList.remove('slam');
+  document.getElementById('pgenspinner').style.display='block';
+  buildProgressDots();
+  document.getElementById('ritualQ').textContent='What Have The Gods Chosen For You?';
+  document.getElementById('ritualLbl').textContent='AWAITING FATE';
+  setSlotIdle();
+}
+
+function buildScrollItems(cfg,final){
+  const items=[];
+  for(let k=0;k<30;k++) items.push(pick(cfg.pool));
+  items.push(final);
+  return items;
+}
+
+function addChip(text,isCorrupt){
+  const c=document.getElementById('chips');
+  const d=document.createElement('div');
+  d.className='chip'+(isCorrupt?' corrupt':'');
+  d.textContent=text;
+  c.appendChild(d);
+}
+
+const SLOWMO_CHANCE={region:0.35,affiliation:0.35,status:0.35,trait:0.35,gift:0.6,race:0.65};
+
+function triggerSlowmoBoom(cfg,inner,visibleIdx,cb){
+  setTimeout(()=>{
+    const slotBig=document.getElementById('slotBig');
+    slotBig.classList.add('boom-hit');
+    playSfx('boom');
+    setTimeout(()=>slotBig.classList.remove('boom-hit'),300);
+    const swapPool=cfg.corruptible?cfg.corrupt:cfg.rare;
+    if(swapPool&&swapPool.length&&Math.random()<0.5){
+      const el=inner.children[visibleIdx];
+      if(el) el.textContent=pick(swapPool);
+    }
+    setTimeout(cb,150);
+  },500);
+}
+
+function triggerCorruptionHit(slotEl){
+  slotEl.classList.add('corrupt-hit');
+  playSfx('glitch');
+  document.getElementById('root').classList.add('tainted','taintpulse');
+  setTimeout(()=>{
+    slotEl.classList.remove('corrupt-hit');
+    document.getElementById('root').classList.remove('taintpulse');
+  },700);
+}
+
+function raceGoldFlash(cb){
+  const slotBig=document.getElementById('slotBig');
+  slotBig.classList.add('finale-hit');
+  playSfx('chime');
+  setTimeout(()=>{
+    slotBig.classList.remove('finale-hit');
+    setTimeout(cb,600);
+  },650);
+}
+
+function spinOne(i,onDone){
+  const cfg=CFG[i];
+  document.getElementById('ritualQ').textContent=cfg.question;
+  document.getElementById('ritualLbl').textContent=cfg.lbl;
+  const iw=document.getElementById('iconWrap');
+  iw.style.background=cfg.ic;
+  iw.style.borderColor=cfg.ib;
+  iw.textContent=cfg.icon;
+  document.getElementById('pdot'+i).classList.add('active');
+
+  const slotBig=document.getElementById('slotBig');
+  slotBig.classList.add('active');
+  playSfx('reelSpin');
+  if(i>=4) slotBig.classList.add('climax'); else slotBig.classList.remove('climax');
+  if(i===CFG.length-1) slotBig.classList.add('finale'); else slotBig.classList.remove('finale');
+
+  const isCorruptSlot=!!(cfg.corruptible&&corrupted);
+  const final=isCorruptSlot?pick(cfg.corrupt):pick(cfg.pool);
+  results[cfg.key]=final;
+
+  const items=buildScrollItems(cfg,final);
+  const inner=document.getElementById('drumInner');
+  const ITEM_H=64,PAD=4;
+  inner.innerHTML='';
+  items.forEach((txt,idx)=>{
+    const d=document.createElement('div');
+    d.className='drum-item'+(idx===items.length-1?' hi':'');
+    d.textContent=txt;
+    inner.appendChild(d);
+  });
+  const totalItems=items.length;
+  const startOffset=ITEM_H*PAD;
+  inner.style.transform=`translateY(${startOffset}px)`;
+  const endOffset=-(ITEM_H*(totalItems-1));
+  const DURATION=DURATIONS[i];
+  let start=performance.now();
+  let paused=false;
+
+  const slowmoChance=SLOWMO_CHANCE[cfg.key]!==undefined?SLOWMO_CHANCE[cfg.key]:0.35;
+  let slowmoDone=!(Math.random()<slowmoChance);
+
+  function ease(t){
+    if(t<0.7) return t/0.7*0.85;
+    const r=(t-0.7)/0.3;
+    return 0.85+0.15*(1-Math.pow(1-r,3));
+  }
+
+  function frame(now){
+    if(paused)return;
+    const t=Math.min((now-start)/DURATION,1);
+    const e=ease(t);
+    const y=startOffset+(endOffset-startOffset)*e;
+    inner.style.transform=`translateY(${y}px)`;
+    if(!slowmoDone&&t>=0.78){
+      slowmoDone=true;
+      paused=true;
+      const pauseStart=performance.now();
+      const visibleIdx=Math.max(0,Math.min(totalItems-1,Math.round(-y/ITEM_H)));
+      triggerSlowmoBoom(cfg,inner,visibleIdx,()=>{
+        start+=performance.now()-pauseStart;
+        paused=false;
+        requestAnimationFrame(frame);
+      });
+      return;
+    }
+    if(t<1){requestAnimationFrame(frame);}
+    else{
+      inner.style.transform=`translateY(${endOffset}px)`;
+      slotBig.classList.remove('active');
+      stopSfx('reelSpin');
+      document.getElementById('pdot'+i).classList.remove('active');
+      if(isCorruptSlot) triggerCorruptionHit(slotBig);
+      setTimeout(()=>{
+        setTimeout(()=>{
+          document.getElementById('pdot'+i).classList.add(isCorruptSlot?'corrupt':'done');
+          addChip(final,isCorruptSlot);
+          playSfx('click');
+          onDone();
+        },400);
+      },1000);
+    }
+  }
+  requestAnimationFrame(frame);
+}
+
+function runSlot(i){
+  spinOne(i,()=>{cur++;setTimeout(next,GAPS[i]);});
+}
+
+function showSuspense(cb){
+  const el=document.getElementById('suspense');
+  playSfx('riser');
+  const lines=['THE FINAL THREAD AWAITS...','THE GODS EXAMINE YOUR BLOOD...','THEY HAVE DECIDED...'];
+  let idx=0;
+  el.classList.add('show');
+  function showLine(){
+    el.textContent=lines[idx];
+    idx++;
+    if(idx<lines.length){setTimeout(showLine,700);}
+    else{setTimeout(()=>{el.classList.remove('show');cb();},700);}
+  }
+  showLine();
+}
+
+function runAssembly(cb){
+  const a=document.getElementById('assembling');
+  a.classList.remove('manifest');
+  a.textContent='ASSEMBLING DESTINY...';
+  a.classList.add('show');
+  const chipEls=[...document.getElementById('chips').children];
+  chipEls.forEach((chip,idx)=>{
+    setTimeout(()=>{
+      chip.classList.add('locking');
+      setTimeout(()=>chip.classList.remove('locking'),280);
+    },idx*400);
+  });
+  const totalLockTime=chipEls.length*400+280;
+  setTimeout(()=>{
+    document.getElementById('chips').classList.add('converge');
+    a.textContent='IDENTITY FORMED';
+    setTimeout(()=>{
+      document.getElementById('chips').classList.remove('converge');
+      a.classList.remove('show');
+      cb();
+    },600);
+  },totalLockTime+150);
+}
+
+function runVillainEntrance(cb){
+  const a=document.getElementById('assembling');
+  document.getElementById('root').classList.add('villainpulse');
+  playSfx('villain');
+  a.textContent='⚠ A VILLAIN HAS BEEN BORN ⚠';
+  a.classList.add('show','villain','villainbig');
+  setTimeout(()=>{
+    document.getElementById('root').classList.remove('villainpulse');
+  },700);
+  setTimeout(()=>{
+    a.classList.remove('show','villain','villainbig');
+    cb();
+  },1500);
+}
+
+function runManifestation(cb){
+  const a=document.getElementById('assembling');
+  playSfx(corrupted?'glitch':'chime');
+  const phrases=corrupted
+    ?['THE DARKNESS HAS ANSWERED','A CURSE TAKES FORM','THE VILLAIN AWAKENS']
+    :['THE GODS HAVE SPOKEN','YOUR FATE TAKES FORM','THE CHOSEN HERO EMERGES'];
+  a.textContent=pick(phrases);
+  a.classList.add('show','manifest');
+  if(corrupted) a.classList.add('villain');
+  setTimeout(()=>{
+    a.classList.remove('show','manifest','villain');
+    cb();
+  },1600);
+}
+
+function runForgingVessel(cb){
+  const a=document.getElementById('assembling');
+  playSfx('forge');
+  a.textContent=corrupted?'FORGING A VESSEL OF RUIN...':'FORGING YOUR VESSEL...';
+  a.classList.add('show');
+  if(corrupted) a.classList.add('villain');
+  setTimeout(()=>{
+    a.classList.remove('show','villain');
+    cb();
+  },1300);
+}
+
+function openCard(){
+  running=false;
+  document.getElementById('spinbtn').disabled=false;
+  document.getElementById('spinbtn').textContent='SPIN AGAIN';
+  document.getElementById('reelwrap').style.display='block';
+  document.getElementById('pgenwrap').style.display='none';
+  showCard();
+}
+
+function runGeneratingPortrait(cb){
+  lastPortraitError='';
+  lastPortraitDataUrl='';
+  document.getElementById('reelwrap').style.display='none';
+  document.getElementById('pgenwrap').style.display='block';
+  const pimg=document.getElementById('pgenimg');
+  const pspin=document.getElementById('pgenspinner');
+  const pframe=document.getElementById('pgenframe');
+  pimg.style.opacity='0';
+  pimg.classList.remove('slam');
+  pspin.style.display='block';
+  if(corrupted){pframe.classList.add('villain');document.getElementById('pgenflash').classList.add('villain');}
+  else{pframe.classList.remove('villain');document.getElementById('pgenflash').classList.remove('villain');}
+
+  const phrases=corrupted
+    ?['UNRAVELING YOUR FORM...','MANIFESTING THE CURSED...','GENERATING THE VILLAIN...']
+    :['WEAVING YOUR FORM...','MANIFESTING THE CHOSEN...','GENERATING PORTRAIT...'];
+  let pIdx=0;
+  const q=document.getElementById('ritualQ');
+  document.getElementById('ritualLbl').textContent='';
+  function cyclePhrase(){q.textContent=phrases[pIdx%phrases.length];pIdx++;}
+  cyclePhrase();
+  const phraseTimer=setInterval(cyclePhrase,1400);
+
+  portraitStartTime=performance.now();
+  const r=results;
+  const STYLE_VARIANTS=['oil painting style','digital concept art','hyperrealistic render','ink and watercolor blend','matte painting style','charcoal sketch style'];
+  const POSE_VARIANTS=['close-up portrait','three-quarter view','low angle heroic shot','intense direct gaze','side profile silhouette','over-the-shoulder glance'];
+  const MOOD_VARIANTS=['cold blue rim light','warm amber glow','moody fog atmosphere','harsh dramatic shadows','ethereal backlight','smoky haze'];
+  const CORRUPT_MOOD_VARIANTS=['sickly green haze','flickering candlelight','crackling dark energy','rotting mist','blood-red glow'];
+  const RACE_DESCRIPTORS={
+    'Human':'human face, realistic human proportions, natural skin tone',
+    'Beastfolk':'animalistic features, beast ears, fur-covered skin, feral eyes',
+    'Half-Blood':'mixed heritage features, slightly pointed ears, unusual eye color',
+    'Elven':'tall slender build, long pointed ears, sharp angular face, ethereal beauty',
+    'Dwarven':'short stocky build, broad shoulders, thick beard, stout muscular frame',
+    'Fallen-Born':'dark veins under skin, hollow eyes, fallen angel aesthetic, dark wings hint',
+    'Orcish':'green-grey skin, prominent tusks, heavy brow ridge, powerful jaw',
+    'Drakkin':'scales on skin, reptilian eyes, draconic facial features, horns',
+    'Fae-Touched':'iridescent skin shimmer, delicate sharp features, luminous eyes, faint glow',
+    'Stoneborn':'grey stone-like skin, cracked texture, heavy angular features, rock-solid build',
+    'Skyborn':'pale almost white skin, feathered brows, wind-swept hair, light in eyes',
+    'Frostkin':'ice-blue skin tone, frost-white hair, pale lips, frozen breath visible',
+    // corrupted races
+    'Void Walker':'body partially dissolved into shadow, void where eyes should be',
+    'Shade Born':'translucent dark skin, ghost-like form, barely solid',
+    'Corrupted One':'rotting flesh patches, dark veins covering face, hollow gaze',
+    'The Unnamed':'featureless blank face, shifting form, unsettling proportions',
+    'Nightmare Kin':'nightmare creature features, wrong angles, horror anatomy',
+    'Soul Husk':'skeletal thin face, empty hollow eye sockets, gaunt body',
+    'The Hollowed':'caved-in chest, hollow ribcage visible, empty expression',
+    'Plaguekin':'boil-covered skin, sickly yellow eyes, rotting extremities',
+    'Abyss-Touched':'darkness swirling around body, deep black eyes, abyss reflection in skin',
+    'The Forsaken Flesh':'flesh melting at edges, body unraveling, horror dark fantasy',
+  };
+  const raceDesc=RACE_DESCRIPTORS[r.race]||`${r.race} fantasy race`;
+  const promptParts=corrupted
+    ?[`corrupted ${r.race}`,raceDesc,`twisted by ${r.gift}`,`from ${r.region}`,`${r.trait} corrupted appearance`,'glowing eyes','dark energy swirling','horror dark fantasy art',pick(POSE_VARIANTS),pick(CORRUPT_MOOD_VARIANTS),'black background']
+    :[raceDesc,`${r.race} fantasy warrior`,`from ${r.region}`,`${r.affiliation} faction`,`${r.status} rank`,`${r.gift} power`,`${r.trait} appearance`,pick(STYLE_VARIANTS),pick(POSE_VARIANTS),pick(MOOD_VARIANTS),'ornate armor','black background'];
+  const prompt=encodeURIComponent(promptParts.join(', '));
+  const seed=Math.floor(Math.random()*9999999);
+  const w=200,h=280;
+  const keyParam=POLLINATIONS_KEY?`&key=${POLLINATIONS_KEY}`:'';
+  const urls=[
+    `https://image.pollinations.ai/prompt/${prompt}?width=${w}&height=${h}&seed=${seed}&model=flux${keyParam}`,
+    `https://gen.pollinations.ai/image/${prompt}?width=${w}&height=${h}&seed=${seed}&model=flux${keyParam}`,
+  ];
+
+  let attempt=0;
+  let resolvedUrl='';
+
+  function finalize(success){
+    clearInterval(phraseTimer);
+    pspin.style.display='none';
+    if(success){
+      pimg.src=resolvedUrl;
+      pimg.style.opacity='1';
+      pimg.classList.add('slam');
+      playSfx('boom');
+      pframe.classList.add('slamshake');
+      const pf=document.getElementById('pgenflash');
+      pf.classList.add('fire');
+      setTimeout(()=>{pf.classList.remove('fire');pimg.classList.remove('slam');pframe.classList.remove('slamshake');},850);
+      lastPortraitUrl=resolvedUrl;
+    } else {
+      lastPortraitUrl='';
+    }
+    setTimeout(cb,1000);
+  }
+
+  function settle(success){
+    const elapsed=performance.now()-portraitStartTime;
+    const wait=Math.max(0,MIN_FORGE_TIME-elapsed);
+    setTimeout(()=>finalize(success),wait);
+  }
+
+  function plainImgFallback(url,onOk,onFail){
+    const t=new Image();
+    t.onload=()=>onOk(t.src);
+    t.onerror=onFail;
+    t.src=url;
+  }
+
+  function tryLoad(){
+    if(attempt>=urls.length){settle(false);return;}
+    const currentUrl=urls[attempt];
+    const attemptNum=attempt;
+    let settled=false;
+    const timeoutId=setTimeout(()=>{
+      if(settled)return;
+      settled=true;
+      lastPortraitError='attempt '+attemptNum+': timed out after 9s';
+      attempt++;
+      tryLoad();
+    },9000);
+
+    const fetchOpts=POLLINATIONS_KEY?{headers:{'Authorization':'Bearer '+POLLINATIONS_KEY}}:{};
+    fetch(currentUrl,fetchOpts).then(res=>{
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      return res.blob();
+    }).then(blob=>{
+      if(settled)return;
+      if(blob.size<2000||blob.size>500000){
+        throw new Error('odd size '+blob.size+'b');
+      }
+      settled=true;
+      clearTimeout(timeoutId);
+      resolvedUrl=URL.createObjectURL(blob);
+      const reader=new FileReader();
+      reader.onload=()=>{lastPortraitDataUrl=reader.result;settle(true);};
+      reader.onerror=()=>{lastPortraitDataUrl='';settle(true);};
+      reader.readAsDataURL(blob);
+    }).catch((err)=>{
+      if(settled)return;
+      const fetchErrMsg=(err&&err.message)?err.message:'fetch blocked';
+      plainImgFallback(currentUrl,(src)=>{
+        if(settled)return;
+        settled=true;
+        clearTimeout(timeoutId);
+        resolvedUrl=src;
+        settle(true);
+      },()=>{
+        if(settled)return;
+        settled=true;
+        clearTimeout(timeoutId);
+        lastPortraitError='attempt '+attemptNum+': fetch('+fetchErrMsg+') then img also failed';
+        attempt++;
+        tryLoad();
+      });
+    });
+  }
+  tryLoad();
+}
+
+function finishSequence(){
+  runAssembly(()=>{
+    if(corrupted){
+      runVillainEntrance(()=>{runManifestation(()=>{runForgingVessel(()=>{runGeneratingPortrait(openCard);});});});
+    } else {
+      runManifestation(()=>{runForgingVessel(()=>{runGeneratingPortrait(openCard);});});
+    }
+  });
+}
+
+function next(){
+  if(cur>=CFG.length){finishSequence();return;}
+  if(cur===CFG.length-1){showSuspense(()=>raceGoldFlash(()=>runSlot(cur)));}
+  else{runSlot(cur);}
+}
+
+function onSpin(){
+  if(running)return;
+  running=true;
+  document.getElementById('spinbtn').disabled=true;
+  resetStage();
+  corrupted=Math.random()<0.15;
+  setTimeout(next,150);
+}
+
+function showCard(){
+  document.getElementById('charcard').style.display='block';
+  document.getElementById('charcard').classList.remove('detailsin');
+  const px=['Kael','Vorn','Sael','Drex','Mora','Aesh','Zynn','Threl','Kova','Nyx'];
+  const sx=['dar','ith','en','or','ax','ys','el','as','on','ur'];
+  const charName=pick(px)+pick(sx);
+  document.getElementById('ccname').textContent=charName;
+  const cb=document.getElementById('cbadge');
+  corrupted?cb.classList.add('show'):cb.classList.remove('show');
+
+  const r=results;
+  const icons=['🐺','🌙','⚔️','👑','✨','🔥'];
+  const lbls=['RACE','REGION','AFFILIATION','STATUS','GIFT','TRAIT'];
+  const vals=[r.race,r.region,r.affiliation,r.status,r.gift,r.trait];
+  document.getElementById('ccattrs').innerHTML=vals.map((v,i)=>`
+    <div class="arow" style="animation-delay:${i*90}ms"><span class="aico">${icons[i]}</span><span class="albl">${lbls[i]}</span><span class="aval">${v}</span></div>`).join('');
+
+  const syns=[
+    `Born of ${r.race} blood in the ${r.region}, they rose as a ${r.status} of the ${r.affiliation}. Their ${r.gift} sets them apart — ${corrupted?'yet something ancient and wrong stirs beneath their skin':'a gift as dangerous as it is divine'}.`,
+    `From the depths of ${r.region} came a ${r.race} unlike any other. Cast as a ${r.status} by the ${r.affiliation}, they carry the ${r.gift} — ${corrupted?'a curse threatening to consume the world':'a burden written in blood and fire'}.`,
+    `The ${r.affiliation} did not expect a ${r.race} from ${r.region} to shake their foundations. A ${r.status} emerged — bearer of the ${r.gift}${corrupted?', tainted by the void':''}, marked by fate itself.`,
+  ];
+  const synText=pick(syns);
+  document.getElementById('synbody').textContent=synText;
+
+  const qs=[
+    `"The gods spun my fate. I will spin theirs."`,
+    `"I did not choose the ${r.gift}. It chose the ruin that follows me."`,
+    `"${r.affiliation} gave me purpose. ${r.region} gave me rage."`,
+    corrupted?`"I am what remains when the gods look away."`: `"They called me ${r.status}. I call it freedom."`,
+  ];
+  const quoteText=pick(qs);
+  document.getElementById('synquote').textContent=quoteText;
+
+  saveCharacterToArchive({
+    name:charName,
+    corrupted:corrupted,
+    results:{...r},
+    synopsis:synText,
+    quote:quoteText,
+    portraitData:lastPortraitDataUrl,
+    savedAt:new Date().toISOString()
+  });
+
+  const img=document.getElementById('portimg');
+  const loading=document.getElementById('ploading');
+  if(lastPortraitUrl){
+    loading.style.display='none';
+    img.style.opacity='1';
+    img.src=lastPortraitUrl;
+  } else {
+    img.style.opacity='0';
+    loading.style.display='flex';
+    loading.innerHTML='<div class="ptxt" style="color:#6a5a3a;font-size:8px;text-align:center;padding:4px;line-height:1.4">PORTRAIT<br>UNAVAILABLE<br><span style="opacity:.75;font-size:7px">'+(lastPortraitError||'no details')+'</span></div>';
+  }
+  document.getElementById('charcard').classList.add('detailsin');
+}
+function goBack(){document.getElementById('charcard').style.display='none';}
+
+// ---- Legend Archive (localStorage save / copy-code backup / restore) ----
+const ARCHIVE_KEY='sbg_legend_archive';
+
+function getArchive(){
+  try{
+    const raw=localStorage.getItem(ARCHIVE_KEY);
+    return raw?JSON.parse(raw):[];
+  }catch(e){return [];}
+}
+function setArchive(list){
+  try{localStorage.setItem(ARCHIVE_KEY,JSON.stringify(list));}catch(e){}
+}
+function saveCharacterToArchive(record){
+  const list=getArchive();
+  list.push(record);
+  setArchive(list);
+}
+function encodeCharacterCode(record){
+  const {portraitData,...rest}=record;
+  return btoa(encodeURIComponent(JSON.stringify(rest)));
+}
+function decodeCharacterCode(code){
+  return JSON.parse(decodeURIComponent(atob(code.trim())));
+}
+function buildLeonardoPrompt(c){
+  const r=c.results;
+  const RACE_DESCRIPTORS={
+    'Human':'human face, realistic human proportions, natural skin tone',
+    'Beastfolk':'animalistic features, beast ears, fur-covered skin, feral eyes',
+    'Half-Blood':'mixed heritage features, slightly pointed ears, unusual eye color',
+    'Elven':'tall slender build, long pointed ears, sharp angular face, ethereal beauty',
+    'Dwarven':'short stocky build, broad shoulders, thick beard, stout muscular frame',
+    'Fallen-Born':'dark veins under skin, hollow eyes, fallen angel aesthetic, dark wings hint',
+    'Orcish':'green-grey skin, prominent tusks, heavy brow ridge, powerful jaw',
+    'Drakkin':'scales on skin, reptilian eyes, draconic facial features, horns',
+    'Fae-Touched':'iridescent skin shimmer, delicate sharp features, luminous eyes, faint glow',
+    'Stoneborn':'grey stone-like skin, cracked texture, heavy angular features, rock-solid build',
+    'Skyborn':'pale almost white skin, feathered brows, wind-swept hair, light in eyes',
+    'Frostkin':'ice-blue skin tone, frost-white hair, pale lips, frozen breath visible',
+    'Void Walker':'body partially dissolved into shadow, void where eyes should be',
+    'Shade Born':'translucent dark skin, ghost-like form, barely solid',
+    'Corrupted One':'rotting flesh patches, dark veins covering face, hollow gaze',
+    'The Unnamed':'featureless blank face, shifting form, unsettling proportions',
+    'Nightmare Kin':'nightmare creature features, wrong angles, horror anatomy',
+    'Soul Husk':'skeletal thin face, empty hollow eye sockets, gaunt body',
+    'The Hollowed':'caved-in chest, hollow ribcage visible, empty expression',
+    'Plaguekin':'boil-covered skin, sickly yellow eyes, rotting extremities',
+    'Abyss-Touched':'darkness swirling around body, deep black eyes, abyss reflection in skin',
+    'The Forsaken Flesh':'flesh melting at edges, body unraveling, horror dark fantasy',
+  };
+  const raceDesc=RACE_DESCRIPTORS[r.race]||`${r.race} fantasy race`;
+  if(c.corrupted){
+    return `corrupted ${r.race}, ${raceDesc}, twisted by ${r.gift}, from ${r.region}, ${r.trait} corrupted appearance, glowing eyes, dark energy swirling, dynamic action fighting pose, dark fantasy illustration, dramatic lighting, detailed armor, high detail`;
+  }
+  return `${r.race} fantasy warrior, ${raceDesc}, from ${r.region}, ${r.affiliation} faction, ${r.status} rank, ${r.gift} power, ${r.trait} appearance, dynamic action fighting pose, dark fantasy illustration, ornate armor, dramatic lighting, high detail`;
+}
+function renderArchiveList(){
+  const list=getArchive();
+  const el=document.getElementById('archiveList');
+  if(!list.length){
+    el.innerHTML='<div class="archiveempty">No characters saved yet. Spin to create your first legend.</div>';
+    return;
+  }
+  el.innerHTML=list.map((c,idx)=>idx).reverse().map(realIdx=>{
+    const c=list[realIdx];
+    const hasImg=!!c.portraitData;
+    const hasSecret=!!(c.secret&&c.secret.trim());
+    return `<div class="archiveitem${c.corrupted?' corrupt':''}">
+      <div class="archtop">
+        <div>
+          <div class="archname">${c.name}</div>
+          <div class="archmeta">${c.results.race} · ${c.results.affiliation}${c.corrupted?' · ⚠ Corrupted':''}</div>
+        </div>
+        <button class="archdeletebtn" onclick="deleteCharacter(${realIdx})" title="Delete this character">🗑</button>
+      </div>
+      <div class="archactions">
+        <button class="archcopybtn" onclick="copyCharacterCode(${realIdx},this)">📋 CODE</button>
+        <button class="archcopybtn" onclick="copyLeonardoPrompt(${realIdx},this)">🎨 PROMPT</button>
+        <button class="archcopybtn" onclick="downloadPortrait(${realIdx},this)" ${hasImg?'':'disabled title="No saved image for this character"'}>⬇ IMAGE</button>
+      </div>
+      <div class="archsecretbox">
+        <div class="archsecretlbl">✦ CHARACTER SECRET</div>
+        <div class="archsecrettext${hasSecret?'':' empty'}" id="secretDisplay${realIdx}">${hasSecret?c.secret:'No secret set yet — paste from Myth Engine below'}</div>
+        <textarea class="archsecretinput" id="secretInput${realIdx}" placeholder="Paste generated secret here...">${hasSecret?c.secret:''}</textarea>
+        <div class="archsecretbtns">
+          <button class="archsecretsave" onclick="toggleSecretEdit(${realIdx})">✏ EDIT SECRET</button>
+          <button class="archsecretsave" id="secretSaveBtn${realIdx}" onclick="saveSecret(${realIdx})" style="display:none">💾 SAVE SECRET</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function copyLeonardoPrompt(idx,btnEl){
+  const list=getArchive();
+  const record=list[idx];
+  if(!record)return;
+  const prompt=buildLeonardoPrompt(record);
+  navigator.clipboard.writeText(prompt).then(()=>{
+    btnEl.textContent='✓ COPIED';
+    btnEl.classList.add('copied');
+    setTimeout(()=>{btnEl.textContent='🎨 PROMPT';btnEl.classList.remove('copied');},1500);
+  }).catch(()=>{
+    btnEl.textContent='✗ FAILED';
+    setTimeout(()=>{btnEl.textContent='🎨 PROMPT';},1500);
+  });
+}
+function downloadPortrait(idx,btnEl){
+  const list=getArchive();
+  const record=list[idx];
+  if(!record||!record.portraitData)return;
+  const a=document.createElement('a');
+  a.href=record.portraitData;
+  a.download=record.name+'_portrait.jpg';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  if(btnEl){
+    btnEl.textContent='✓ SAVED';
+    setTimeout(()=>{btnEl.textContent='⬇ IMAGE';},1500);
+  }
+}
+function copyCharacterCode(idx,btnEl){
+  const list=getArchive();
+  const record=list[idx];
+  if(!record)return;
+  const code=encodeCharacterCode(record);
+  navigator.clipboard.writeText(code).then(()=>{
+    btnEl.textContent='✓ COPIED';
+    btnEl.classList.add('copied');
+    setTimeout(()=>{btnEl.textContent='📋 COPY CODE';btnEl.classList.remove('copied');},1500);
+  }).catch(()=>{
+    btnEl.textContent='✗ FAILED';
+    setTimeout(()=>{btnEl.textContent='📋 COPY CODE';},1500);
+  });
+}
+function importCharacterCode(){
+  const input=document.getElementById('restoreInput');
+  const msg=document.getElementById('restoreMsg');
+  const code=input.value.trim();
+  msg.classList.remove('err');
+  if(!code){msg.classList.add('err');msg.textContent='Paste a code first.';return;}
+  try{
+    const record=decodeCharacterCode(code);
+    if(!record||!record.name||!record.results) throw new Error('bad data');
+    // preserve existing secret if restored code has none
+    const list=getArchive();
+    const existing=list.find(c=>c.name===record.name&&c.savedAt===record.savedAt);
+    if(existing&&existing.secret&&!record.secret){
+      record.secret=existing.secret;
+    }
+    saveCharacterToArchive(record);
+    renderArchiveList();
+    input.value='';
+    msg.textContent=`${record.name} restored to the archive.`;
+  }catch(e){
+    msg.classList.add('err');
+    msg.textContent='Invalid code — check that you copied it completely.';
+  }
+}
+function toggleSecretEdit(idx){
+  const input=document.getElementById('secretInput'+idx);
+  const saveBtn=document.getElementById('secretSaveBtn'+idx);
+  const isOpen=input.classList.contains('open');
+  if(isOpen){
+    input.classList.remove('open');
+    saveBtn.style.display='none';
+  } else {
+    input.classList.add('open');
+    saveBtn.style.display='block';
+    input.focus();
+  }
+}
+function saveSecret(idx){
+  const list=getArchive();
+  const record=list[idx];
+  if(!record)return;
+  const input=document.getElementById('secretInput'+idx);
+  const val=input.value.trim();
+  record.secret=val;
+  list[idx]=record;
+  setArchive(list);
+  const display=document.getElementById('secretDisplay'+idx);
+  if(display){
+    display.textContent=val||'No secret set yet — paste from Myth Engine below';
+    display.classList.toggle('empty',!val);
+  }
+  input.classList.remove('open');
+  const saveBtn=document.getElementById('secretSaveBtn'+idx);
+  if(saveBtn){
+    saveBtn.style.display='none';
+    saveBtn.textContent='✓ SAVED';
+    saveBtn.classList.add('saved');
+    setTimeout(()=>{saveBtn.textContent='💾 SAVE SECRET';saveBtn.classList.remove('saved');},1500);
+  }
+}
+function deleteCharacter(idx){
+  const list=getArchive();
+  const record=list[idx];
+  if(!record)return;
+  const sure=confirm(`Delete ${record.name} from the Legend Archive? This cannot be undone.`);
+  if(!sure)return;
+  list.splice(idx,1);
+  setArchive(list);
+  renderArchiveList();
+}
+function openArchive(){
+  renderArchiveList();
+  document.getElementById('archivecard').style.display='block';
+}
+function closeArchive(){
+  document.getElementById('archivecard').style.display='none';
+}
+
+resetStage();
+</script>
