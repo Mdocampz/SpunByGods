@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Power Spin — Spun By Gods</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+body{background:#050308;min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:20px 0}
+.root{width:380px;min-height:680px;background:#0d0810;font-family:'Cinzel',serif;color:#e8d5a3;position:relative;overflow:hidden;transition:box-shadow .6s}
+.bglayer{position:absolute;inset:0;background:radial-gradient(ellipse at 20% 10%,rgba(140,60,200,0.16) 0%,transparent 50%),radial-gradient(ellipse at 80% 90%,rgba(200,80,30,0.16) 0%,transparent 50%);pointer-events:none;z-index:0;transition:background 1.4s}
+.root.tainted .bglayer{background:radial-gradient(ellipse at 20% 10%,rgba(140,60,200,0.16) 0%,transparent 50%),radial-gradient(ellipse at 80% 90%,rgba(20,90,55,0.24) 0%,transparent 50%)}
+.root.taintpulse{animation:taintFlash .7s ease}
+@keyframes taintFlash{0%{box-shadow:inset 0 0 0 rgba(39,174,96,0)}30%{box-shadow:inset 0 0 70px rgba(39,174,96,.4)}100%{box-shadow:inset 0 0 0 rgba(39,174,96,0)}}
+.z1{position:relative;z-index:1}
+
+/* HEADER */
+.hdr{text-align:center;padding:18px 16px 6px}
+.htitle{font-size:26px;font-weight:700;letter-spacing:4px;color:#b266e8;text-shadow:0 0 24px rgba(178,102,232,0.45)}
+.hdiv{width:160px;height:1px;background:linear-gradient(90deg,transparent,#b266e855,transparent);margin:5px auto}
+.htag{font-family:'Crimson Text',serif;font-style:italic;font-size:10px;letter-spacing:3px;color:#6a5a8a}
+.hlbl{font-size:8px;letter-spacing:4px;color:#7a6a9a;margin-top:5px}
+.phaselbl{font-size:8px;letter-spacing:3px;color:#3a2a45;margin-top:3px}
+
+/* SELECTED CHAR MINI CARD */
+.selchar{margin:8px 18px 0;background:rgba(18,8,22,0.85);border:1px solid rgba(178,102,232,0.25);border-radius:6px;padding:7px 10px;display:flex;align-items:center;gap:8px}
+.selchar.corrupt{border-color:rgba(39,174,96,.4)}
+.selchar-name{font-size:12px;font-weight:600;color:#ecd0f8}
+.selchar-meta{font-family:'Crimson Text',serif;font-size:9px;color:#7a6a9a;font-style:italic}
+.selchar-badge{font-size:8px;letter-spacing:1.5px;color:#27ae60;background:rgba(39,174,96,0.12);border:1px solid rgba(39,174,96,.3);border-radius:3px;padding:2px 6px;margin-left:auto;flex-shrink:0}
+
+/* PROGRESS */
+.progress{display:flex;justify-content:center;gap:9px;padding:14px 16px 2px}
+.pdot{width:7px;height:7px;border-radius:50%;background:rgba(178,102,232,0.12);border:1px solid rgba(178,102,232,0.22);transition:all .4s}
+.pdot.active{background:#b266e8;box-shadow:0 0 9px rgba(178,102,232,.75);transform:scale(1.35)}
+.pdot.done{background:rgba(178,102,232,0.55);border-color:rgba(178,102,232,0.4)}
+.pdot.corrupt{background:#27ae60;border-color:#27ae60;box-shadow:0 0 9px rgba(39,174,96,.75)}
+
+/* STAGE */
+.stage{padding:10px 18px 0;text-align:center}
+.ritualq{font-family:'Crimson Text',serif;font-style:italic;font-size:14px;color:#dccaa0;letter-spacing:.3px;min-height:18px;transition:opacity .25s}
+.rituallbl{font-size:8px;letter-spacing:3px;color:#7a6a9a;margin:3px 0 10px}
+
+/* REEL */
+.reelwrap{margin:0 18px;background:rgba(5,3,8,0.92);border:1px solid rgba(178,102,232,0.3);border-radius:10px;overflow:hidden}
+.slot{height:88px;position:relative;overflow:hidden;transition:box-shadow .3s}
+.slot.active{box-shadow:inset 0 0 16px rgba(178,102,232,0.16)}
+.slot.climax.active{box-shadow:inset 0 0 24px rgba(178,102,232,0.28)}
+.slot.corrupt-hit{animation:glitchHit .55s}
+@keyframes glitchHit{0%{box-shadow:inset 0 0 16px rgba(39,174,96,0.1)}20%{box-shadow:inset 0 0 32px rgba(39,174,96,0.65);transform:translateX(-3px)}40%{transform:translateX(3px)}60%{box-shadow:inset 0 0 44px rgba(39,174,96,0.85);transform:translateX(-1px)}100%{box-shadow:inset 0 0 18px rgba(39,174,96,0.25);transform:translateX(0)}}
+.slot.finale-hit{animation:violetHit .65s ease}
+@keyframes violetHit{0%{box-shadow:inset 0 0 16px rgba(178,102,232,.15)}30%{box-shadow:inset 0 0 55px rgba(178,102,232,.9)}100%{box-shadow:inset 0 0 18px rgba(178,102,232,.3)}}
+.slot.boom-hit{animation:boomHit .3s ease}
+@keyframes boomHit{0%{transform:translateX(0)}15%{box-shadow:inset 0 0 50px rgba(255,255,255,0.9);transform:translateX(-4px)}30%{transform:translateX(4px)}50%{box-shadow:inset 0 0 30px rgba(255,255,255,0.5);transform:translateX(-2px)}100%{box-shadow:inset 0 0 12px rgba(178,102,232,0.15);transform:translateX(0)}}
+.slot-icon-wrap{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;border:1px solid rgba(255,255,255,0.08);z-index:4;transition:background .3s,border-color .3s}
+.drum{position:absolute;left:60px;right:0;top:0;bottom:0;overflow:hidden;z-index:3}
+.drum-inner{position:absolute;left:0;right:0;top:0;will-change:transform}
+.drum-item{height:88px;display:flex;align-items:center;padding:0 10px;font-size:10.5px;line-height:1.25;font-weight:600;letter-spacing:.2px;color:#6a5a8a;white-space:normal;overflow:hidden}
+.drum-item.hi{color:#ecd0f8;font-size:12px;text-shadow:0 0 9px rgba(236,208,248,0.45)}
+.slot.climax .drum-item{font-size:11px}
+.slot.climax .drum-item.hi{font-size:13px}
+.drum-top{position:absolute;left:60px;right:0;top:0;height:18px;background:linear-gradient(to bottom,rgba(12,8,18,1),transparent);z-index:5;pointer-events:none}
+.drum-bot{position:absolute;left:60px;right:0;bottom:0;height:18px;background:linear-gradient(to top,rgba(12,8,18,1),transparent);z-index:5;pointer-events:none}
+.drum-line{position:absolute;left:60px;right:0;top:50%;height:1px;background:rgba(178,102,232,0.2);z-index:6;pointer-events:none;transform:translateY(-50%)}
+
+/* CHIPS */
+.chips{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;padding:9px 16px 0;min-height:20px;transition:transform .5s,filter .5s}
+.chips.converge{animation:converge 1.2s ease}
+@keyframes converge{0%{transform:scale(1)}50%{transform:scale(1.07);filter:brightness(1.45)}100%{transform:scale(1)}}
+.chip{font-family:'Crimson Text',serif;font-size:9px;letter-spacing:.4px;color:#b266e8;background:rgba(178,102,232,0.08);border:1px solid rgba(178,102,232,0.25);border-radius:10px;padding:3px 9px;animation:fadeUp .4s ease;max-width:320px;white-space:normal;text-align:center;line-height:1.4}
+.chip.corrupt{color:#27ae60;border-color:rgba(39,174,96,.45);background:rgba(39,174,96,.08)}
+.chip.locking{animation:lockPulse .3s ease}
+@keyframes lockPulse{0%{transform:scale(1)}50%{transform:scale(1.28);box-shadow:0 0 10px rgba(178,102,232,.65)}100%{transform:scale(1)}}
+
+/* SUSPENSE / ASSEMBLING */
+.suspense{text-align:center;padding:0;font-family:'Crimson Text',serif;font-style:italic;font-size:11px;color:#7a6a9a;opacity:0;height:0;overflow:hidden;transition:opacity .4s}
+.suspense.show{opacity:1;height:18px;padding:8px 0 0;animation:flicker 1.5s ease}
+@keyframes flicker{0%,100%{opacity:.55}50%{opacity:1}}
+.assembling{text-align:center;font-family:'Cinzel',serif;font-size:10px;letter-spacing:3px;color:#b266e8;opacity:0;height:0;overflow:hidden;transition:opacity .4s}
+.assembling.show{opacity:1;height:auto;padding:12px 0 0;animation:pulseGlow 1.3s ease}
+.assembling.manifest{font-size:13px;letter-spacing:4px}
+.assembling.villain{color:#e85a5a;text-shadow:0 0 14px rgba(232,90,90,.7)}
+.assembling.villainbig{font-size:14px;letter-spacing:2px}
+.root.villainpulse{animation:villainFlash .7s ease}
+@keyframes villainFlash{0%{box-shadow:inset 0 0 0 rgba(200,30,30,0)}25%{box-shadow:inset 0 0 90px rgba(200,30,30,.55);transform:translateX(-3px)}50%{transform:translateX(3px)}75%{box-shadow:inset 0 0 60px rgba(200,30,30,.35);transform:translateX(-1px)}100%{box-shadow:inset 0 0 0 rgba(200,30,30,0);transform:translateX(0)}}
+@keyframes pulseGlow{0%,100%{text-shadow:0 0 6px rgba(178,102,232,.3)}50%{text-shadow:0 0 18px rgba(178,102,232,.85)}}
+
+/* SPIN BUTTON */
+.spinarea{padding:14px 18px 5px;text-align:center}
+.spinbtn{background:rgba(18,8,22,0.95);border:1px solid #b266e8;color:#b266e8;font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;padding:9px 20px;border-radius:4px;cursor:pointer;width:100%;transition:all 0.2s;text-shadow:0 0 4px rgba(178,102,232,0.3)}
+.spinbtn:hover:not(:disabled){background:rgba(178,102,232,0.1)}
+.spinbtn:disabled{opacity:0.45;cursor:not-allowed}
+.spinsub{font-family:'Crimson Text',serif;font-style:italic;font-size:9px;color:#3a2a45;letter-spacing:2px;margin-top:3px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* NAV */
+.bnav{display:flex;justify-content:space-around;padding:9px 12px 13px;border-top:1px solid rgba(178,102,232,0.12);margin-top:6px}
+.ni{display:flex;flex-direction:column;align-items:center;gap:2px;opacity:0.45;cursor:pointer;padding:3px 5px;transition:opacity 0.2s}
+.ni.act{opacity:1}
+.nico{width:22px;height:22px;border:1px solid rgba(178,102,232,0.35);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#b266e8}
+.ni.act .nico{border-color:#b266e8;background:rgba(178,102,232,0.08)}
+.nlbl{font-size:7px;letter-spacing:1px;color:#3a2a45}
+.ni.act .nlbl{color:#b266e8}
+
+/* CHARACTER SELECTION OVERLAY */
+.selscreen{position:absolute;inset:0;background:#0d0810;z-index:200;overflow-y:auto;padding:18px;display:flex;flex-direction:column}
+.seltitle{text-align:center;font-size:20px;font-weight:700;letter-spacing:4px;color:#b266e8;text-shadow:0 0 18px rgba(178,102,232,0.4);margin-bottom:4px}
+.seldiv{width:160px;height:1px;background:linear-gradient(90deg,transparent,#b266e855,transparent);margin:5px auto 4px}
+.selsub{text-align:center;font-family:'Crimson Text',serif;font-style:italic;font-size:10px;color:#7a6a9a;letter-spacing:2px;margin-bottom:14px}
+.sellist{display:flex;flex-direction:column;gap:8px;flex:1}
+.selempty{text-align:center;font-family:'Crimson Text',serif;font-style:italic;font-size:11px;color:#4a3a2a;padding:30px 0;line-height:1.7}
+.selempty a{color:#b266e8;text-decoration:none}
+.selitem{background:rgba(18,8,22,0.85);border:1px solid rgba(178,102,232,0.2);border-radius:7px;padding:10px 12px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:10px}
+.selitem:hover{border-color:rgba(178,102,232,0.55);background:rgba(178,102,232,0.06)}
+.selitem.corrupt{border-color:rgba(39,174,96,.35)}
+.selitem.corrupt:hover{border-color:rgba(39,174,96,.7);background:rgba(39,174,96,.05)}
+.selitem-port{width:38px;height:50px;border-radius:4px;overflow:hidden;border:1px solid rgba(178,102,232,0.2);flex-shrink:0;background:rgba(5,3,8,0.8);display:flex;align-items:center;justify-content:center;font-size:16px}
+.selitem-port img{width:100%;height:100%;object-fit:cover}
+.selitem-info{flex:1;min-width:0}
+.selitem-name{font-size:13px;font-weight:600;color:#ecd0f8;margin-bottom:2px}
+.selitem-traits{font-family:'Crimson Text',serif;font-size:9px;color:#7a6a9a;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.selitem-badge{font-size:8px;letter-spacing:1px;color:#27ae60;background:rgba(39,174,96,0.12);border:1px solid rgba(39,174,96,.3);border-radius:3px;padding:2px 5px;flex-shrink:0}
+.selitem-arrow{color:#b266e8;font-size:14px;flex-shrink:0;opacity:0.5}
+.selitem:hover .selitem-arrow{opacity:1}
+
+/* POWER REVEAL CARD */
+.charcard{display:none;position:absolute;inset:0;background:#0d0810;z-index:100;overflow-y:auto;padding:14px;font-family:'Cinzel',serif;color:#e8d5a3}
+.cctop{text-align:center;margin-bottom:10px}
+.cceyebrow{font-size:8px;letter-spacing:4px;color:#b266e8}
+.ccname{font-size:18px;font-weight:700;color:#f0e0b0;text-shadow:0 0 14px rgba(178,102,232,0.35);margin-top:2px}
+.cbadge{display:none;background:rgba(0,25,10,0.8);border:1px solid #27ae60;border-radius:4px;padding:3px 8px;text-align:center;margin-bottom:8px;font-size:8.5px;letter-spacing:2px;color:#27ae60;text-shadow:0 0 3px rgba(39,174,96,0.5)}
+.cbadge.show{display:block;animation:fadeUp 0.5s}
+.savedbadge{display:none;text-align:center;font-size:8.5px;letter-spacing:2px;color:#27ae60;margin-bottom:6px}
+.savedbadge.show{display:block;animation:fadeUp 0.4s}
+.ccbody{display:flex;gap:10px;margin-bottom:10px;align-items:flex-start}
+.cccol-left{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.ccattrs{flex:1}
+.atrsec{margin-bottom:2px}
+.atrseclbl{font-size:8px;letter-spacing:3px;color:#3a2a45;margin:6px 0 2px;padding-top:4px;border-top:1px solid rgba(178,102,232,0.08)}
+.atrseclbl:first-child{border-top:none;margin-top:0}
+.arow{display:flex;align-items:center;gap:5px;padding:3px 0;border-bottom:1px solid rgba(178,102,232,0.06);opacity:0}
+.detailsin .arow{animation:fadeUp .4s ease both}
+.aico{font-size:11px;width:16px;text-align:center;flex-shrink:0}
+.albl{font-size:7px;letter-spacing:1px;color:#3a2a45;width:48px;flex-shrink:0}
+.aval{font-family:'Crimson Text',serif;font-size:9.5px;color:#b266e8;font-weight:600;line-height:1.3}
+.aval.gold{color:#c9a84c}
+.aval.blue{color:#8ab4e8}
+.ccport{width:172px;flex-shrink:0;display:flex;flex-direction:column;gap:8px}
+.portframe{width:172px;height:232px;border:1px solid rgba(178,102,232,0.3);border-radius:8px;overflow:hidden;background:rgba(5,3,10,0.8);display:flex;align-items:center;justify-content:center;position:relative}
+.portimg{width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 0.5s;position:absolute;inset:0}
+.ploading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.ptxt{font-size:7.5px;letter-spacing:1px;color:#3a2a45;text-align:center}
+.synbox{background:rgba(8,5,12,0.8);border:1px solid rgba(178,102,232,0.18);border-radius:5px;padding:8px;margin-bottom:8px;opacity:0}
+.detailsin .synbox{animation:fadeUp .5s ease both;animation-delay:.15s}
+.syntitle{font-size:8.5px;letter-spacing:2px;color:#7a6a9a;margin-bottom:4px}
+.synbody{font-family:'Crimson Text',serif;font-size:11px;color:#a09070;line-height:1.5;font-style:italic}
+.synquote{font-family:'Crimson Text',serif;font-size:11px;color:#7a6a9a;font-style:italic;text-align:center;border-top:1px solid rgba(178,102,232,0.12);margin-top:6px;padding-top:6px}
+.backbtn{background:transparent;border:1px solid rgba(178,102,232,0.35);color:#7a6a9a;font-family:'Cinzel',serif;font-size:8.5px;letter-spacing:2px;padding:7px 12px;border-radius:4px;cursor:pointer;width:100%;transition:all 0.2s;margin-bottom:6px}
+.backbtn:hover{border-color:#b266e8;color:#b266e8}
+.backbtn-row{text-align:center;margin-top:4px}
+.backbtn.compact{width:auto;display:inline-block;font-size:7.5px;letter-spacing:1.5px;padding:5px 16px;margin-bottom:0}
+.nextteaser{text-align:center;font-family:'Cinzel',serif;font-size:8px;letter-spacing:2.5px;color:#5a5030;margin-top:6px;animation:teaserGlow 2.4s ease infinite}
+@keyframes teaserGlow{0%,100%{opacity:.55}50%{opacity:1}}
+</style>
+</head>
+<body>
+
+<div class="root" id="root">
+<div class="bglayer"></div>
+
+<!-- CHARACTER SELECTION SCREEN -->
+<div class="selscreen" id="selscreen">
+  <div class="seltitle">POWER SPIN</div>
+  <div class="seldiv"></div>
+  <div class="selsub">Choose a character to unleash their power</div>
+  <div class="sellist" id="sellist"></div>
+</div>
+
+<!-- MAIN SPIN INTERFACE -->
+<div class="z1" id="mainui" style="display:none">
+  <div class="hdr">
+    <div class="htitle">POWER SPIN</div>
+    <div class="hdiv"></div>
+    <div class="htag">The Soul Is Known. Now Unleash The Power.</div>
+    <div class="hdiv" style="margin-top:5px"></div>
+    <div class="hlbl">✦ POWER REEL ✦</div>
+    <div class="phaselbl">POWER SPIN — PHASE III OF III</div>
+  </div>
+
+  <div class="selchar" id="selcharbar">
+    <div>
+      <div class="selchar-name" id="selcharname">—</div>
+      <div class="selchar-meta" id="selcharmeta">—</div>
+    </div>
+  </div>
+
+  <div class="progress" id="progress"></div>
+
+  <div class="stage">
+    <div class="ritualq" id="ritualQ">What Power Do You Wield?</div>
+    <div class="rituallbl" id="ritualLbl">AWAITING FATE</div>
+  </div>
+
+  <div class="reelwrap" id="reelwrap">
+    <div class="slot" id="slotBig">
+      <div class="slot-icon-wrap" id="iconWrap">⚡</div>
+      <div class="drum" id="drum">
+        <div class="drum-inner" id="drumInner"></div>
+      </div>
+      <div class="drum-top"></div>
+      <div class="drum-bot"></div>
+      <div class="drum-line"></div>
+    </div>
+  </div>
+
+  <div class="chips" id="chips"></div>
+  <div class="suspense" id="suspense"></div>
+  <div class="assembling" id="assembling"></div>
+
+  <div class="spinarea">
+    <button class="spinbtn" id="spinbtn" onclick="onSpin()">UNLEASH THE POWER</button>
+    <div class="spinsub">✦ POWER AWAITS ✦</div>
+  </div>
+
+  <div class="bnav">
+    <div class="ni" onclick="window.location.href='blood_spin.html'"><div class="nico">🩸</div><div class="nlbl">BLOOD SPIN</div></div>
+    <div class="ni" onclick="window.location.href='soul_spin.html'"><div class="nico">☯</div><div class="nlbl">SOUL SPIN</div></div>
+    <div class="ni act"><div class="nico">⚡</div><div class="nlbl">POWER SPIN</div></div>
+    <div class="ni" onclick="window.location.href='blood_spin.html'"><div class="nico">📜</div><div class="nlbl">ARCHIVE</div></div>
+  </div>
+</div>
+
+<!-- POWER REVEAL CARD -->
+<div class="charcard" id="charcard">
+  <div class="cctop">
+    <div class="cceyebrow">✦ POWER UNLEASHED ✦</div>
+    <div class="hdiv" style="background:linear-gradient(90deg,transparent,#b266e855,transparent)"></div>
+    <div class="ccname" id="ccname">—</div>
+  </div>
+  <div class="cbadge" id="cbadge">⚠ FATE DISTORTION ACTIVE ⚠</div>
+  <div class="savedbadge" id="savedbadge">✦ POWER SAVED TO LEGEND ARCHIVE ✦</div>
+  <div class="ccbody">
+    <div class="cccol-left">
+      <div class="ccattrs" id="ccattrs"></div>
+    </div>
+    <div class="ccport">
+      <div class="portframe">
+        <div class="ploading" id="ploading">
+          <div class="ptxt">PORTRAIT<br>FROM<br>BLOOD SPIN</div>
+        </div>
+        <img class="portimg" id="portimg" alt="portrait">
+      </div>
+      <div class="synbox">
+        <div class="syntitle">✦ POWER SYNOPSIS</div>
+        <div class="synbody" id="synbody">—</div>
+        <div class="synquote" id="synquote">—</div>
+      </div>
+    </div>
+  </div>
+  <div class="backbtn-row">
+    <button class="backbtn compact" onclick="goBack()">↺ UNLEASH AGAIN</button>
+  </div>
+  <button class="backbtn" onclick="window.location.href='soul_spin.html'" style="border-color:rgba(138,180,232,0.35);color:#5a6a8a;margin-top:6px">↩ BACK TO SOUL SPIN</button>
+  <div class="nextteaser">✦ THE ARC IS COMPLETE — SHARE THEIR LEGEND ✦</div>
+</div>
+</div>
+
+<script>
+// ---- SFX ----
+const SFX_PATHS={
+  reelSpin:'assets/sfx/reel_spin.mp3',
+  click:'assets/sfx/click_lock.mp3',
+  boom:'assets/sfx/impact_boom.mp3',
+  chime:'assets/sfx/chime_reveal.mp3',
+  forge:'assets/sfx/forge_whoosh.mp3',
+  glitch:'assets/sfx/glitch_dark.mp3',
+  villain:'assets/sfx/villain_roar.mp3',
+  riser:'assets/sfx/suspense_riser.mp3',
+};
+const sfx={};
+Object.entries(SFX_PATHS).forEach(([k,v])=>{
+  const a=new Audio(v);
+  a.preload='auto';
+  sfx[k]=a;
+});
+sfx.reelSpin.loop=true;
+sfx.reelSpin.volume=0.35;
+function playSfx(k,vol){
+  const a=sfx[k];if(!a)return;
+  try{a.currentTime=0;if(vol!==undefined)a.volume=vol;a.play().catch(()=>{});}catch(e){}
+}
+function stopSfx(k,fadeMs=400){
+  const a=sfx[k];if(!a||a.paused)return;
+  const start=a.volume;const step=start/(fadeMs/50);
+  const t=setInterval(()=>{
+    if(a.volume>step){a.volume=Math.max(0,a.volume-step);}
+    else{a.pause();a.volume=start;clearInterval(t);}
+  },50);
+}
+
+// ---- ARCHIVE ----
+const ARCHIVE_KEY='sbg_legend_archive';
+function getArchive(){try{const r=localStorage.getItem(ARCHIVE_KEY);return r?JSON.parse(r):[];}catch(e){return [];}}
+function setArchive(list){try{localStorage.setItem(ARCHIVE_KEY,JSON.stringify(list));}catch(e){}}
+
+// ---- POWER CFG ----
+const CFG=[
+  {key:'magic',icon:'🔥',ic:'rgba(178,102,232,0.15)',ib:'rgba(178,102,232,0.3)',
+   lbl:'MAGIC',question:'What Magic Answers Your Call?',
+   pool:['Flame Conjuration','Shadow Manipulation','Frost Calling','Lightning Channeling','Earth Shaping','Wind Mastery','Blood Magic','Bone Sorcery','Light Weaving','Illusion Crafting','Soul Binding','Time Distortion','Gravity Warping','Spirit Summoning','Rune Casting'],
+   rare:['Forbidden Star Magic','The First Spell Ever Cast'],
+   corrupt:['Magic That Unmakes Reality Itself','Spells No God Dares Name','Sorcery Stolen From The Void Between Worlds','Magic That Feeds On The Caster And Grows Stronger For It','A Power That Rewrites The Laws It Touches','Magic So Old It Predates The Gods Who Banned It','Spells That Leave Scars On The World Itself','The Kind Of Magic Wars Are Fought To Prevent'],
+   corruptible:true},
+  {key:'fightingStyle',icon:'🥊',ic:'rgba(200,80,30,0.15)',ib:'rgba(200,80,30,0.3)',
+   lbl:'FIGHTING STYLE',question:'How Do You Wage War?',
+   pool:['Brutal Close-Quarters Brawling','Precise Blade Dueling','Hit-and-Run Skirmishing','Unshakeable Defensive Wall','Acrobatic Aerial Combat','Berserker Frenzy','Calculated Tactical Strikes','Dual-Wield Whirlwind','Patient Counter-Fighting','Overwhelming Force','Silent Assassination','Shield-and-Spear Discipline','Improvised Brawling','Ranged Precision Warfare'],
+   rare:['A Fighting Style Lost To History','Combat Instincts No Training Could Teach'],
+   corrupt:['A Fighting Style That Breaks Bodies Before They Understand They Are Hit','Combat So Fast The Eye Cannot Process The Kill','War Tactics That Have Never Once Failed','Fighting With The Efficiency Of Something That Has Killed Thousands','A Style Built Entirely Around Making Sure There Is No Counter','Combat That Treats Armies Like Single Opponents','Fighting Born From Surviving What Should Have Killed Him A Hundred Times','A Style So Ruthless His Own Allies Fear Sparring With Him'],
+   corruptible:true},
+  {key:'weapon',icon:'⚔️',ic:'rgba(140,30,60,0.15)',ib:'rgba(140,30,60,0.3)',
+   lbl:'WEAPON',question:'What Weapon Has Chosen You?',
+   pool:['Twin Curved Blades','Ancestral War Hammer','Enchanted Longbow','Soul-Bound Greatsword','Chain-Linked Scythe','Runic Battle Axe','Twin Daggers Of Shadow','Spiked War Gauntlets','Bone Spear','Forged Steel Whip','Crystal-Tipped Lance','Reinforced War Shield','Ritual Dagger','Storm-Forged Trident'],
+   rare:['A Blade Forged Before The First War','The Last Weapon Its Maker Ever Built'],
+   corrupt:['A Weapon That Hungers And Has Never Been Fed Enough','A Blade Forged From Something That Was Never Meant To Be Touched','A Weapon That Remembers Every Life It Has Taken','Something That Was Sealed Away For Good Reason','A Weapon Three Gods Tried To Destroy And Failed','An Armament That Grows Heavier With Every Soul It Has Not Yet Claimed','A Blade That Chose Him — Not The Other Way Around','The Weapon That Ended The Last Age'],
+   corruptible:true},
+  {key:'blessingCurse',icon:'🕯️',ic:'rgba(40,80,140,0.15)',ib:'rgba(40,80,140,0.3)',
+   lbl:'BLESSING / CURSE',question:'What Was Given — Or Taken?',
+   pool:['Blessed With Unnatural Endurance','Cursed To Never Stay Dead Long','Blessed By A Forgotten God','Cursed With Memories That Are Not His Own','Blessed With The Luck Of The Old Kings','Cursed To Feel Every Wound Twice','Blessed With A Body That Heals Too Fast','Cursed To Always Know When Someone Is Lying','Blessed With The Favor Of The Storm','Cursed To Outlive Everyone He Loves','Blessed With Unbreakable Resolve','Cursed By A Debt He Did Not Choose'],
+   rare:['Blessed And Cursed By The Same God In The Same Breath','A Gift So Old Even The Gods Forgot Giving It'],
+   corrupt:['Cursed With A Hunger That Borrowed Strength Cannot Satisfy','Blessed By Something That Should Not Have Been Able To Bless Anything','Cursed To Become Exactly What He Fears Most','A Gift Given By Something That Wanted Something In Return — And Already Took It','Cursed With Power That Was Never Meant To Be Survivable','Blessed By The Last God Anyone Should Want Attention From','A Curse That Made Him Faster, Stronger, And Less Human Each Day','Blessed With Strength Borrowed From Something Still Screaming For It Back'],
+   corruptible:true},
+  {key:'ultimate',icon:'💥',ic:'rgba(232,60,60,0.15)',ib:'rgba(232,60,60,0.3)',
+   lbl:'ULTIMATE',question:'What Is Your Final Form?',
+   pool:['Unleashes A Devastating Area Strike','Channels Overwhelming Elemental Fury','Calls Forth An Ancestral Guardian','Enters An Unstoppable Battle Trance','Summons A Storm Of Blades','Bends The Battlefield To His Will','Unleashes A Wave Of Pure Force','Calls Down Judgment From Above','Channels A Burst Of Forbidden Power','Unleashes His True Bloodline Form'],
+   rare:['A Final Form That Has Only Been Witnessed Once','An Ultimate So Powerful He Has Never Dared Use It Fully'],
+   corrupt:['Unleashes A Power That Erases Everything In Its Path','Calls Forth A Form That Should Not Be Allowed To Exist','Channels Enough Power To End A War In One Strike','Releases A Force That Cracks The Sky Itself','Becomes, For A Moment, Something The Gods Would Call A Mistake','Unleashes The Full Weight Of Everything He Has Ever Survived','A Final Form That Makes Even His Allies Step Back','Channels A Power That No Single Hero Was Ever Meant To Face Alone'],
+   corruptible:true},
+];
+
+const DURATIONS=[3200,3800,4600,5200,8000];
+const GAPS=[200,200,200,200,200];
+
+let results={};
+let corrupted=false;
+let running=false;
+let cur=0;
+let selectedChar=null;
+let selectedCharIdx=-1;
+
+function pick(a){return a[Math.floor(Math.random()*a.length)];}
+
+// ---- SELECTION SCREEN ----
+function loadSelectionScreen(){
+  const list=getArchive();
+  const el=document.getElementById('sellist');
+  if(!list.length){
+    el.innerHTML=`<div class="selempty">No characters found in Legend Archive.<br><br>Complete a <a href="blood_spin.html">Blood Spin</a> first to create a character before unleashing their power.</div>`;
+    return;
+  }
+  const reversed=[...list].reverse();
+  el.innerHTML=reversed.map((c,displayIdx)=>{
+    const realIdx=list.length-1-displayIdx;
+    const hasImg=!!c.portraitData;
+    const traits=[c.results.race,c.results.region,c.results.affiliation].filter(Boolean).join(' · ');
+    return `<div class="selitem${c.corrupted?' corrupt':''}" onclick="selectCharacter(${realIdx})">
+      <div class="selitem-port">
+        ${hasImg?`<img src="${c.portraitData}" alt="portrait">`:'⚔️'}
+      </div>
+      <div class="selitem-info">
+        <div class="selitem-name">${c.name}</div>
+        <div class="selitem-traits">${traits}</div>
+        ${c.power?'<div style="font-size:7.5px;letter-spacing:1px;color:#27ae60;margin-top:2px">✓ Power already unleashed</div>':''}
+      </div>
+      ${c.corrupted?'<div class="selitem-badge">⚠ VILLAIN</div>':''}
+      <div class="selitem-arrow">›</div>
+    </div>`;
+  }).join('');
+}
+
+function selectCharacter(idx){
+  const list=getArchive();
+  selectedChar=list[idx];
+  selectedCharIdx=idx;
+  corrupted=!!selectedChar.corrupted;
+
+  document.getElementById('selcharname').textContent=selectedChar.name;
+  document.getElementById('selcharmeta').textContent=
+    `${selectedChar.results.race} · ${selectedChar.results.affiliation}`;
+  const bar=document.getElementById('selcharbar');
+  if(corrupted){
+    bar.classList.add('corrupt');
+    const badge=document.createElement('div');
+    badge.className='selchar-badge';
+    badge.textContent='⚠ VILLAIN';
+    bar.appendChild(badge);
+  }
+
+  document.getElementById('selscreen').style.display='none';
+  document.getElementById('mainui').style.display='block';
+  buildProgressDots();
+  setSlotIdle();
+}
+
+// ---- SPIN ENGINE ----
+function buildProgressDots(){
+  document.getElementById('progress').innerHTML=CFG.map((_,i)=>
+    `<div class="pdot" id="pdot${i}"></div>`).join('');
+}
+function setSlotIdle(){
+  const iw=document.getElementById('iconWrap');
+  iw.style.background='rgba(255,255,255,0.04)';
+  iw.style.borderColor='rgba(255,255,255,0.08)';
+  iw.textContent='⚡';
+  document.getElementById('drumInner').innerHTML=
+    '<div class="drum-item" style="color:#2a2035">—</div>';
+}
+function resetStage(){
+  results={};cur=0;
+  document.getElementById('chips').innerHTML='';
+  document.getElementById('chips').classList.remove('converge');
+  document.getElementById('assembling').classList.remove('show','manifest','villain','villainbig');
+  document.getElementById('suspense').classList.remove('show');
+  document.getElementById('slotBig').classList.remove('climax','corrupt-hit','finale','finale-hit');
+  document.getElementById('root').classList.remove('tainted','taintpulse','villainpulse');
+  buildProgressDots();
+  document.getElementById('ritualQ').textContent='What Power Do You Wield?';
+  document.getElementById('ritualLbl').textContent='AWAITING FATE';
+  setSlotIdle();
+}
+function addChip(text,isCorrupt){
+  const c=document.getElementById('chips');
+  const d=document.createElement('div');
+  d.className='chip'+(isCorrupt?' corrupt':'');
+  d.textContent=text;
+  c.appendChild(d);
+}
+
+const SLOWMO_CHANCE={magic:0.35,fightingStyle:0.35,weapon:0.4,blessingCurse:0.5,ultimate:0.7};
+
+function triggerSlowmoBoom(cfg,inner,visibleIdx,cb){
+  setTimeout(()=>{
+    const slotBig=document.getElementById('slotBig');
+    slotBig.classList.add('boom-hit');
+    setTimeout(()=>slotBig.classList.remove('boom-hit'),300);
+    if(cfg.rare&&cfg.rare.length&&Math.random()<0.4){
+      const el=inner.children[visibleIdx];
+      if(el)el.textContent=pick(cfg.rare);
+    }
+    setTimeout(cb,150);
+  },500);
+}
+function triggerCorruptionHit(slotEl){
+  slotEl.classList.add('corrupt-hit');
+  document.getElementById('root').classList.add('tainted','taintpulse');
+  setTimeout(()=>{slotEl.classList.remove('corrupt-hit');document.getElementById('root').classList.remove('taintpulse');},700);
+}
+function ultimateVioletFlash(cb){
+  const slotBig=document.getElementById('slotBig');
+  slotBig.classList.add('finale-hit');
+  setTimeout(()=>{slotBig.classList.remove('finale-hit');setTimeout(cb,600);},650);
+}
+
+function spinOne(i,onDone){
+  const cfg=CFG[i];
+  playSfx('reelSpin');
+  document.getElementById('ritualQ').textContent=cfg.question;
+  document.getElementById('ritualLbl').textContent=cfg.lbl;
+  const iw=document.getElementById('iconWrap');
+  iw.style.background=cfg.ic;
+  iw.style.borderColor=cfg.ib;
+  iw.textContent=cfg.icon;
+  document.getElementById('pdot'+i).classList.add('active');
+
+  const slotBig=document.getElementById('slotBig');
+  slotBig.classList.add('active');
+  if(i>=3)slotBig.classList.add('climax');else slotBig.classList.remove('climax');
+  if(i===CFG.length-1)slotBig.classList.add('finale');else slotBig.classList.remove('finale');
+
+  const isCorruptSlot=!!(cfg.corruptible&&corrupted);
+  const final=isCorruptSlot?pick(cfg.corrupt):pick(cfg.pool);
+  results[cfg.key]=final;
+
+  const items=[];
+  for(let k=0;k<30;k++)items.push(pick(cfg.pool));
+  items.push(final);
+
+  const inner=document.getElementById('drumInner');
+  const ITEM_H=88,PAD=4;
+  inner.innerHTML='';
+  items.forEach((txt,idx)=>{
+    const d=document.createElement('div');
+    d.className='drum-item'+(idx===items.length-1?' hi':'');
+    d.textContent=txt;
+    inner.appendChild(d);
+  });
+  const totalItems=items.length;
+  const startOffset=ITEM_H*PAD;
+  inner.style.transform=`translateY(${startOffset}px)`;
+  const endOffset=-(ITEM_H*(totalItems-1));
+  const DURATION=DURATIONS[i];
+  let start=performance.now();
+  let paused=false;
+  const slowmoChance=SLOWMO_CHANCE[cfg.key]!==undefined?SLOWMO_CHANCE[cfg.key]:0.35;
+  let slowmoDone=!(Math.random()<slowmoChance);
+
+  function ease(t){
+    if(t<0.7)return t/0.7*0.85;
+    const r=(t-0.7)/0.3;
+    return 0.85+0.15*(1-Math.pow(1-r,3));
+  }
+  function frame(now){
+    if(paused)return;
+    const t=Math.min((now-start)/DURATION,1);
+    const e=ease(t);
+    const y=startOffset+(endOffset-startOffset)*e;
+    inner.style.transform=`translateY(${y}px)`;
+    if(!slowmoDone&&t>=0.78){
+      slowmoDone=true;paused=true;
+      const pauseStart=performance.now();
+      const visibleIdx=Math.max(0,Math.min(totalItems-1,Math.round(-y/ITEM_H)));
+      triggerSlowmoBoom(cfg,inner,visibleIdx,()=>{
+        start+=performance.now()-pauseStart;paused=false;
+        requestAnimationFrame(frame);
+      });
+      return;
+    }
+    if(t<1){requestAnimationFrame(frame);}
+    else{
+      inner.style.transform=`translateY(${endOffset}px)`;
+      stopSfx('reelSpin');
+      slotBig.classList.remove('active');
+      document.getElementById('pdot'+i).classList.remove('active');
+      if(isCorruptSlot)triggerCorruptionHit(slotBig);
+      setTimeout(()=>{
+        setTimeout(()=>{
+          document.getElementById('pdot'+i).classList.add(isCorruptSlot?'corrupt':'done');
+          playSfx('click',0.5);
+          const chip=document.createElement('div');
+          chip.className='chip'+(isCorruptSlot?' corrupt':'');
+          chip.textContent=final;
+          document.getElementById('chips').appendChild(chip);
+          chip.classList.add('locking');
+          setTimeout(()=>chip.classList.remove('locking'),280);
+          onDone();
+        },400);
+      },1000);
+    }
+  }
+  requestAnimationFrame(frame);
+}
+
+function runSlot(i){spinOne(i,()=>{cur++;setTimeout(next,GAPS[i]);});}
+
+function showSuspense(cb){
+  const el=document.getElementById('suspense');
+  const lines=['THE FINAL POWER STIRS...','THE GODS WEIGH HIS STRENGTH...','SOMETHING AWAKENS...'];
+  let idx=0;
+  playSfx('riser',0.7);
+  el.classList.add('show');
+  function showLine(){
+    el.textContent=lines[idx];idx++;
+    if(idx<lines.length){setTimeout(showLine,700);}
+    else{setTimeout(()=>{el.classList.remove('show');cb();},700);}
+  }
+  showLine();
+}
+
+function runAssembly(cb){
+  const a=document.getElementById('assembling');
+  a.classList.remove('manifest');
+  a.textContent='THE POWER TAKES SHAPE...';
+  a.classList.add('show');
+  const chipEls=[...document.getElementById('chips').children];
+  chipEls.forEach((chip,idx)=>{
+    setTimeout(()=>{
+      chip.classList.add('locking');
+      setTimeout(()=>chip.classList.remove('locking'),280);
+    },idx*400);
+  });
+  const totalLockTime=chipEls.length*400+280;
+  setTimeout(()=>{
+    document.getElementById('chips').classList.add('converge');
+    a.textContent='POWER FORGED';
+    setTimeout(()=>{
+      document.getElementById('chips').classList.remove('converge');
+      a.classList.remove('show');cb();
+    },600);
+  },totalLockTime+150);
+}
+
+function runVillainEntrance(cb){
+  const a=document.getElementById('assembling');
+  document.getElementById('root').classList.add('villainpulse');
+  playSfx('villain',0.8);
+  a.textContent='⚠ THE VILLAIN\'S POWER GROWS ⚠';
+  a.classList.add('show','villain','villainbig');
+  setTimeout(()=>{document.getElementById('root').classList.remove('villainpulse');},700);
+  setTimeout(()=>{a.classList.remove('show','villain','villainbig');cb();},1500);
+}
+
+function runManifestation(cb){
+  const a=document.getElementById('assembling');
+  playSfx(corrupted?'glitch':'chime',0.8);
+  const phrases=corrupted
+    ?['THE DARKNESS IS UNLEASHED','THE VILLAIN AWAKENS FULLY','NO HERO IS READY FOR THIS']
+    :['THE POWER HAS AWAKENED','THE HERO STANDS COMPLETE','THE ARC IS FULFILLED'];
+  a.textContent=pick(phrases);
+  a.classList.add('show','manifest');
+  if(corrupted)a.classList.add('villain');
+  setTimeout(()=>{a.classList.remove('show','manifest','villain');cb();},1600);
+}
+
+function finishSequence(){
+  runAssembly(()=>{
+    if(corrupted){
+      runVillainEntrance(()=>{runManifestation(()=>{playSfx('forge',0.6);setTimeout(openCard,1200);});});
+    } else {
+      runManifestation(()=>{playSfx('forge',0.6);setTimeout(openCard,1200);});
+    }
+  });
+}
+
+function next(){
+  if(cur>=CFG.length){finishSequence();return;}
+  if(cur===CFG.length-1){showSuspense(()=>ultimateVioletFlash(()=>runSlot(cur)));}
+  else{runSlot(cur);}
+}
+
+function onSpin(){
+  if(running||!selectedChar)return;
+  running=true;
+  document.getElementById('spinbtn').disabled=true;
+  resetStage();
+  setTimeout(next,150);
+}
+
+// ---- SAVE POWER RESULTS TO ARCHIVE ----
+function savePowerToArchive(){
+  const list=getArchive();
+  if(selectedCharIdx<0||selectedCharIdx>=list.length)return;
+  list[selectedCharIdx].power={...results};
+  setArchive(list);
+  const badge=document.getElementById('savedbadge');
+  if(badge){badge.classList.add('show');}
+}
+
+// ---- REVEAL CARD ----
+function openCard(){
+  running=false;
+  document.getElementById('spinbtn').disabled=false;
+  document.getElementById('spinbtn').textContent='UNLEASH AGAIN';
+  savePowerToArchive();
+  showCard();
+}
+
+function showCard(){
+  document.getElementById('charcard').style.display='block';
+  document.getElementById('charcard').classList.remove('detailsin');
+  const b=selectedChar;
+  const r=b.results;
+  const s=b.soul||null;
+  const p=results;
+  document.getElementById('ccname').textContent=b.name;
+  const cb=document.getElementById('cbadge');
+  corrupted?cb.classList.add('show'):cb.classList.remove('show');
+
+  const bloodRows=[
+    {ico:'🐺',lbl:'RACE',val:r.race},
+    {ico:'⚔️',lbl:'FACTION',val:r.affiliation},
+    {ico:'✨',lbl:'GIFT',val:r.gift},
+  ];
+  const soulRows=s?[
+    {ico:'🌀',lbl:'PERSONALITY',val:s.personality},
+    {ico:'⚖️',lbl:'ALIGNMENT',val:s.alignment},
+  ]:[];
+  const powerRows=[
+    {ico:'🔥',lbl:'MAGIC',val:p.magic},
+    {ico:'🥊',lbl:'STYLE',val:p.fightingStyle},
+    {ico:'⚔️',lbl:'WEAPON',val:p.weapon},
+    {ico:'🕯️',lbl:'BLESS/CURSE',val:p.blessingCurse},
+    {ico:'💥',lbl:'ULTIMATE',val:p.ultimate},
+  ];
+
+  let html='<div class="atrseclbl">✦ BLOOD</div>';
+  bloodRows.forEach((row,i)=>{
+    html+=`<div class="arow" style="animation-delay:${i*50}ms">
+      <span class="aico">${row.ico}</span><span class="albl">${row.lbl}</span><span class="aval gold">${row.val}</span>
+    </div>`;
+  });
+  if(soulRows.length){
+    html+='<div class="atrseclbl">✦ SOUL</div>';
+    soulRows.forEach((row,i)=>{
+      html+=`<div class="arow" style="animation-delay:${(i+3)*50}ms">
+        <span class="aico">${row.ico}</span><span class="albl">${row.lbl}</span><span class="aval blue">${row.val}</span>
+      </div>`;
+    });
+  }
+  html+='<div class="atrseclbl">✦ POWER</div>';
+  powerRows.forEach((row,i)=>{
+    html+=`<div class="arow" style="animation-delay:${(i+5)*50}ms">
+      <span class="aico">${row.ico}</span><span class="albl">${row.lbl}</span><span class="aval">${row.val}</span>
+    </div>`;
+  });
+  document.getElementById('ccattrs').innerHTML=html;
+
+  const img=document.getElementById('portimg');
+  const loading=document.getElementById('ploading');
+  if(b.portraitData){
+    loading.style.display='none';
+    img.style.opacity='1';
+    img.src=b.portraitData;
+  } else {
+    img.style.opacity='0';
+    loading.style.display='flex';
+  }
+
+  const syns=corrupted?[
+    `${b.name} no longer needs to threaten anyone. The ${p.weapon.toLowerCase()} in their hands and the ${p.magic.toLowerCase()} in their blood already did that work. What's left is the ${p.ultimate.toLowerCase()} — and no hero in this story is ready for it.`,
+    `The ${r.affiliation} built a monster and called it a soldier. ${b.name} wields ${p.magic.toLowerCase()}, fights with ${p.fightingStyle.toLowerCase()}, and when pushed, ${p.ultimate.toLowerCase()}. They were not made to be defeated.`,
+    `Every faction that crosses ${b.name} learns the same lesson too late: the ${p.weapon.toLowerCase()} was never the threat. The ${p.blessingCurse.toLowerCase()} is.`,
+  ]:[
+    `${b.name} carries the ${r.gift.toLowerCase()} of their blood and the ${p.magic.toLowerCase()} of their training. In battle, they rely on ${p.fightingStyle.toLowerCase()}, armed with their ${p.weapon.toLowerCase()}. When all else fails, they ${p.ultimate.toLowerCase()}.`,
+    `Shaped by the ${r.affiliation}, ${b.name} wields ${p.magic.toLowerCase()} like a second heartbeat. Their ${p.weapon.toLowerCase()} has seen every battle that mattered. They are ${p.blessingCurse.toLowerCase()}.`,
+    `${b.name}'s power was never given freely — it was earned. ${p.magic} runs through them, their ${p.fightingStyle.toLowerCase()} has never failed them, and when the moment comes, they ${p.ultimate.toLowerCase()}.`,
+  ];
+  document.getElementById('synbody').textContent=pick(syns);
+
+  const quotes=corrupted?[
+    `"${p.ultimate}. That is not a threat. That is a promise."`,
+    `"They sent heroes. They should have sent more."`,
+    `"My power was never meant to be survivable."`,
+  ]:[
+    `"${p.ultimate}. That is who I am when there is no other choice."`,
+    `"The blood made me. The soul shaped me. This — this is what I chose to become."`,
+    `"I ${p.fightingStyle.toLowerCase()}. The rest takes care of itself."`,
+  ];
+  document.getElementById('synquote').textContent=pick(quotes);
+  document.getElementById('charcard').classList.add('detailsin');
+}
+
+function goBack(){
+  document.getElementById('charcard').style.display='none';
+  resetStage();
+  running=false;
+  document.getElementById('spinbtn').disabled=false;
+  document.getElementById('spinbtn').textContent='UNLEASH THE POWER';
+}
+
+// ---- INIT ----
+loadSelectionScreen();
+</script>
+</body>
+</html>
